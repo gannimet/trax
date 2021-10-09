@@ -1,30 +1,16 @@
 import express from 'express';
-import { Sequelize, DataTypes } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
+import Director from './models/director';
+import Movie from './models/movie';
 
 const app = express();
-const sequelize = new Sequelize('trax', 'root', 'zeSrK595L2gC', {
-  host: 'localhost',
+const sequelize = new Sequelize({
+  database: 'trax',
   dialect: 'mysql',
-  define: {
-    timestamps: false,
-  },
-});
-
-const Director = sequelize.define('Director', {
-  id: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-    primaryKey: true,
-  },
-  first_name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  last_name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  }
+  host: 'localhost',
+  username: 'root',
+  password: 'zeSrK595L2gC',
+  models: [__dirname + '/models'],
 });
 
 sequelize.authenticate().then(
@@ -37,7 +23,16 @@ sequelize.authenticate().then(
 );
 
 app.get('/', (req, res) => {
-  Director.findAll().then(
+  // Movie.findAll({ include: [Director] }).then(
+  //   (data) => {
+  //     res.send(data);
+  //   },
+  //   (err) => {
+  //     console.log('Error querying:', err);
+  //   }
+  // );
+
+  Director.findAll({ include: [Movie] }).then(
     (data) => {
       res.send(data);
     },
