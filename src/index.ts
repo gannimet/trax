@@ -1,5 +1,5 @@
-const express = require('express');
-const { Sequelize, DataTypes } = require('sequelize');
+import express from 'express';
+import { Sequelize, DataTypes } from 'sequelize';
 
 const app = express();
 const sequelize = new Sequelize('trax', 'root', 'zeSrK595L2gC', {
@@ -31,7 +31,7 @@ sequelize.authenticate().then(
   () => {
     console.log('Promise resolved - connection successful');
   },
-  (err) => {
+  (err: any) => {
     console.log('Promise rejected with error:', err);
   },
 );
@@ -39,7 +39,6 @@ sequelize.authenticate().then(
 app.get('/', (req, res) => {
   Director.findAll().then(
     (data) => {
-      console.log('data:', data);
       res.send(data);
     },
     (err) => {
