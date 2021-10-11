@@ -1,0 +1,7 @@
+{
+  "database": "trax",
+  "dialect": "mysql",
+  "host": "localhost",
+  "username": "root",
+  "password": ""
+}

@@ -1,15 +1,14 @@
 import express from 'express';
 import { Sequelize } from 'sequelize-typescript';
+import { Dialect } from 'sequelize/types';
+import * as dbConf from '../db.conf.json';
 import Director from './models/director';
 import Movie from './models/movie';
 
 const app = express();
 const sequelize = new Sequelize({
-  database: 'trax',
-  dialect: 'mysql',
-  host: 'localhost',
-  username: 'root',
-  password: 'zeSrK595L2gC',
+  ...dbConf,
+  dialect: dbConf.dialect as Dialect,
   models: [__dirname + '/models'],
 });
 
