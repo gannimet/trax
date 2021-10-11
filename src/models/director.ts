@@ -1,6 +1,14 @@
-import { Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+  Column,
+  DataType,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+} from 'sequelize-typescript';
 import Movie from './movie';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface DirectorAttributes {}
 
 @Table({

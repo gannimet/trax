@@ -17,7 +17,7 @@ sequelize.authenticate().then(
   () => {
     console.log('Promise resolved - connection successful');
   },
-  (err: any) => {
+  (err: Error) => {
     console.log('Promise rejected with error:', err);
   },
 );
@@ -38,7 +38,7 @@ app.get('/', (req, res) => {
     },
     (err) => {
       console.log('Error querying:', err);
-    }
+    },
   );
 });
 
