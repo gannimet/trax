@@ -23,5 +23,11 @@ module.exports = {
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
     'prettier/prettier': ['error', { singleQuote: true }],
+    'padding-line-between-statements': [
+      'error',
+      { blankLine: 'always', prev: '*', next: 'export' },
+      { blankLine: 'always', prev: '*', next: 'class' },
+      { blankLine: 'always', prev: '*', next: 'return' },
+    ],
   },
 };

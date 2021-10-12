@@ -7,16 +7,13 @@ import {
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
-import Director from './director';
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface MovieAttributes {}
+import Team from './team';
 
 @Table({
   timestamps: false,
   underscored: true,
 })
-export default class Movie extends Model<MovieAttributes> {
+export default class TeamSprint extends Model {
   @PrimaryKey
   @Column(DataType.STRING)
   id?: string;
@@ -24,13 +21,19 @@ export default class Movie extends Model<MovieAttributes> {
   @Column(DataType.STRING)
   name?: string;
 
-  @Column(DataType.INTEGER)
-  yearOfRelease?: number;
-
-  @ForeignKey(() => Director)
   @Column(DataType.STRING)
-  directorId?: string;
+  description?: string;
 
-  @BelongsTo(() => Director)
-  director?: Director;
+  @Column(DataType.BOOLEAN)
+  active?: boolean;
+
+  @Column(DataType.INTEGER)
+  sortIndex?: number;
+
+  @ForeignKey(() => Team)
+  @Column(DataType.STRING)
+  teamId?: string;
+
+  @BelongsTo(() => Team)
+  team?: Team;
 }
