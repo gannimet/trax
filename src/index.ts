@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { json } from 'express';
 import { Sequelize } from 'sequelize-typescript';
 import { Dialect } from 'sequelize/types';
 import * as dbConf from '../db.conf.json';
@@ -20,6 +20,7 @@ sequelize.authenticate().then(
   },
 );
 
+app.use(json());
 app.use('/users', router);
 
 app.listen(4000);
