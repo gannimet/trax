@@ -12,7 +12,7 @@ export const authMiddleWare = (
   if (authHeader) {
     const token = authHeader.split(' ')?.[1];
 
-    jwt.verify(token, tokenSecret, (err, user) => {
+    jwt.verify(token, tokenSecret, (err) => {
       if (err) {
         return res.sendStatus(403);
       }

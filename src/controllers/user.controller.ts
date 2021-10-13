@@ -4,26 +4,34 @@ import UserService from '../services/user.service';
 export default class UserController {
   userService = new UserService();
 
-  login = (req: Request, res: Response): void => {
-    const { username, password } = req.body;
-
-    this.userService.login(username, password).then(
-      (accessToken) => {
-        res.send({ accessToken });
+  getAllUsers = (req: Request, res: Response): void => {
+    this.userService.getAllUsers().then(
+      (data) => {
+        return res.send(data);
       },
-      (error) => {
-        res.status(403).send({ error });
+      (err) => {
+        console.log('Error querying:', err);
+
+        return res.sendStatus(500);
       },
     );
   };
 
-  getAllUsers = (req: Request, res: Response): void => {
-    this.userService.getAllUsers().then(
+  getUserById = (req: Request, res: Response): void => {
+    const { userId } = req.params;
+
+    this.userService.getUserById(userId).then(
       (data) => {
-        res.send(data);
+        if (data) {
+          return res.send(data);
+        }
+
+        return res.sendStatus(404);
       },
       (err) => {
         console.log('Error querying:', err);
+
+        return res.sendStatus(500);
       },
     );
   };
