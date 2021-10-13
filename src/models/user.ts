@@ -1,13 +1,16 @@
 import {
+  BelongsTo,
   BelongsToMany,
   Column,
   DataType,
+  ForeignKey,
   Model,
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
 import Team from './team';
 import TeamUser from './team-user';
+import UserRole from './user-role';
 
 @Table({
   timestamps: false,
@@ -38,4 +41,11 @@ export default class User extends Model {
 
   @BelongsToMany(() => Team, () => TeamUser)
   teams?: Team[];
+
+  @ForeignKey(() => UserRole)
+  @Column(DataType.STRING)
+  roleId?: string;
+
+  @BelongsTo(() => UserRole)
+  role?: UserRole;
 }

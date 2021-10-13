@@ -21,13 +21,16 @@ export default class TeamUser extends Model {
   id?: string;
 
   @Column(DataType.BOOLEAN)
-  canCreate?: boolean;
+  canEditTickets?: boolean;
 
   @Column(DataType.BOOLEAN)
-  canEdit?: boolean;
+  canDeleteTickets?: boolean;
 
   @Column(DataType.BOOLEAN)
-  canDelete?: boolean;
+  canEditSprints?: boolean;
+
+  @Column(DataType.BOOLEAN)
+  canDeleteSprints?: boolean;
 
   @ForeignKey(() => Team)
   @Column(DataType.STRING)
