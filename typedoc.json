@@ -1,0 +1,9 @@
+{
+  "out": "docs",
+  "entryPointStrategy": "expand",
+  "entryPoints": [
+    "./src"
+  ],
+  "tsconfig": "tsconfig.json",
+  "darkHighlightTheme": "dark-plus"
+}

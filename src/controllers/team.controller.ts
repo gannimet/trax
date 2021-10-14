@@ -1,23 +1,23 @@
+import { RequestHandler } from 'express';
 import TeamService from '../services/team.service';
-import { HttpErrorString } from './constants/http-error-string';
 import {
-  ControllerMethod,
   getVerifiedUserToken,
   sendDataResponse,
   sendDataResponseWith404Option,
+  sendDeleteResponse,
   sendErrorResponse,
 } from './utils/req-res.utils';
 
 export default class TeamController {
   constructor(private teamService: TeamService) {}
 
-  getAllTeams: ControllerMethod = (req, res) => {
+  getAllTeams: RequestHandler = (req, res) => {
     this.teamService
       .getAllTeams()
       .then(sendDataResponse(res), sendErrorResponse(res));
   };
 
-  getTeamById: ControllerMethod = (req, res) => {
+  getTeamById: RequestHandler = (req, res) => {
     const { teamId } = req.params;
 
     this.teamService
@@ -25,7 +25,7 @@ export default class TeamController {
       .then(sendDataResponseWith404Option(res), sendErrorResponse(res));
   };
 
-  createSprint: ControllerMethod = (req, res) => {
+  createSprint: RequestHandler = (req, res) => {
     const { name, description } = req.body;
     const { teamId } = req.params;
 
@@ -37,28 +37,14 @@ export default class TeamController {
     }, sendErrorResponse(res));
   };
 
-  deleteSprint: ControllerMethod = (req, res) => {
+  deleteSprint: RequestHandler = (req, res) => {
     const { teamId, sprintId } = req.params;
 
     getVerifiedUserToken(req).then((user) => {
       this.teamService
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         .deleteSprint(teamId, sprintId, user.id!)
-        .then((count) => {
-          if (count === 1) {
-            return res.sendStatus(204);
-          }
-
-          if (count < 1) {
-            return res.status(404).send({
-              error: HttpErrorString.RESOURCE_NOT_FOUND,
-            });
-          }
-
-          return res.status(500).send({
-            error: HttpErrorString.AMBIGIOUS_REQUEST,
-          });
-        }, sendErrorResponse(res));
+        .then(sendDeleteResponse(res), sendErrorResponse(res));
     }, sendErrorResponse(res));
   };
 }

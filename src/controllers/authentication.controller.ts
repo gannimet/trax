@@ -1,10 +1,10 @@
+import { RequestHandler } from 'express';
 import AuthenticationService from '../services/authentication.service';
-import { ControllerMethod } from './utils/req-res.utils';
 
 export default class AuthenticationController {
   constructor(private authService: AuthenticationService) {}
 
-  login: ControllerMethod = (req, res) => {
+  login: RequestHandler = (req, res) => {
     const { username, password } = req.body;
 
     this.authService.login(username, password).then(

@@ -1,6 +1,6 @@
+import { RequestHandler } from 'express';
 import UserService from '../services/user.service';
 import {
-  ControllerMethod,
   sendDataResponse,
   sendDataResponseWith404Option,
   sendErrorResponse,
@@ -9,13 +9,13 @@ import {
 export default class UserController {
   constructor(private userService: UserService) {}
 
-  getAllUsers: ControllerMethod = (req, res) => {
+  getAllUsers: RequestHandler = (req, res) => {
     this.userService
       .getAllUsers()
       .then(sendDataResponse(res), sendErrorResponse(res));
   };
 
-  getUserById: ControllerMethod = (req, res) => {
+  getUserById: RequestHandler = (req, res) => {
     const { userId } = req.params;
 
     this.userService
