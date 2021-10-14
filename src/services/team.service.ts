@@ -30,11 +30,40 @@ export default class TeamService {
       where: {
         userId,
         teamId,
+        canEditSprints: true,
       },
     }).then(
       (teamUser) => {
-        if (teamUser && teamUser.canEditSprints) {
+        if (teamUser) {
           return this.createSprintLegitimized(teamId, name, description);
+        }
+
+        return Promise.reject({
+          statusCode: 403,
+          errorMessage: HttpErrorString.MISSING_RIGHTS,
+        } as HttpErrorMessage);
+      },
+      (teamUserErr) => {
+        return Promise.reject(teamUserErr);
+      },
+    );
+  }
+
+  deleteSprint(
+    teamId: string,
+    sprintId: string,
+    userId: string,
+  ): Promise<number> {
+    return TeamUser.findOne({
+      where: {
+        userId,
+        teamId,
+        canDeleteSprints: true,
+      },
+    }).then(
+      (teamUser) => {
+        if (teamUser) {
+          return this.deleteSprintLegitimized(sprintId);
         }
 
         return Promise.reject({
@@ -61,6 +90,14 @@ export default class TeamService {
       name,
       description,
       active: false,
+    });
+  }
+
+  private deleteSprintLegitimized(sprintId: string): Promise<number> {
+    return TeamSprint.destroy({
+      where: {
+        id: sprintId,
+      },
     });
   }
 }

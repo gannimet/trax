@@ -22,7 +22,7 @@ export const sendDataResponseWith404Option = <E>(
       return res.status(successStatus).send(data);
     }
 
-    return res.sendStatus(404);
+    return res.status(404).send(HttpErrorString.RESOURCE_NOT_FOUND);
   };
 };
 
@@ -46,7 +46,7 @@ export const sendErrorResponse = (res: Response, status = 500) => {
       errorMessage = error.errorMessage;
       errorStatus = error.statusCode;
     } else {
-      errorMessage = error;
+      errorMessage = `${error.name} - ${error.message}` ?? error;
     }
 
     console.log('sending error message:', errorMessage);
@@ -56,7 +56,13 @@ export const sendErrorResponse = (res: Response, status = 500) => {
 };
 
 interface TokenMetaData {
+  /**
+   * Issued at timestamp
+   */
   iat: number;
+  /**
+   * Expires at timestamp
+   */
   exp: number;
 }
 
@@ -88,7 +94,7 @@ export const getVerifiedUserToken = (
     } else {
       return reject({
         statusCode: 401,
-        errorMessage: HttpErrorString.MISSING_AUTHORIZATION,
+        errorMessage: HttpErrorString.UNAUTHORIZED,
       } as HttpErrorMessage);
     }
   });

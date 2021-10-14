@@ -7,6 +7,7 @@ const teamController = new TeamController(new TeamService());
 
 teamRouter.get('/', teamController.getAllTeams);
 teamRouter.get('/:teamId', teamController.getTeamById);
-teamRouter.put('/:teamId/sprints', teamController.createSprint);
+teamRouter.post('/:teamId/sprints', teamController.createSprint);
+teamRouter.delete('/:teamId/sprints/:sprintId', teamController.deleteSprint);
 
 export default teamRouter;

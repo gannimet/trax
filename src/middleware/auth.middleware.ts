@@ -13,7 +13,7 @@ export const authMiddleWare = (
       next();
     },
     (err: HttpErrorMessage) => {
-      res.sendStatus(err.statusCode);
+      res.status(err.statusCode).send({ error: err.errorMessage });
     },
   );
 };
