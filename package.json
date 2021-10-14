@@ -27,7 +27,8 @@
     "mysql2": "^2.3.0",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.6.5",
-    "sequelize-typescript": "^2.1.0"
+    "sequelize-typescript": "^2.1.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
@@ -35,6 +36,7 @@
     "@types/jsonwebtoken": "^8.5.5",
     "@types/node": "^16.10.3",
     "@types/sequelize": "^4.28.10",
+    "@types/uuid": "^8.3.1",
     "@types/validator": "^13.6.3",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "eslint-config-airbnb-typescript": "^14.0.1",

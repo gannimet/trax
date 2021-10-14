@@ -2,10 +2,12 @@ import {
   BelongsToMany,
   Column,
   DataType,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
+import TeamSprint from './team-sprint';
 import TeamUser from './team-user';
 import User from './user';
 
@@ -29,4 +31,7 @@ export default class Team extends Model {
 
   @BelongsToMany(() => User, () => TeamUser)
   users?: User[];
+
+  @HasMany(() => TeamSprint)
+  sprints?: TeamSprint[];
 }

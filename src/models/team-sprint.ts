@@ -3,15 +3,18 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
 import Team from './team';
+import Ticket from './ticket';
 
 @Table({
   timestamps: false,
   underscored: true,
+  tableName: 'TeamsSprints',
 })
 export default class TeamSprint extends Model {
   @PrimaryKey
@@ -36,4 +39,7 @@ export default class TeamSprint extends Model {
 
   @BelongsTo(() => Team)
   team?: Team;
+
+  @HasMany(() => Ticket)
+  tickets?: Ticket[];
 }

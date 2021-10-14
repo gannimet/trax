@@ -6,6 +6,9 @@ export default class UserService {
   getAllUsers(): Promise<User[]> {
     return User.findAll({
       include: [Team],
+      attributes: {
+        exclude: ['password', 'roleId'],
+      },
     });
   }
 

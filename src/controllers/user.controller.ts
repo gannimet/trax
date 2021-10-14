@@ -1,38 +1,25 @@
-import { Request, Response } from 'express';
 import UserService from '../services/user.service';
+import {
+  ControllerMethod,
+  sendDataResponse,
+  sendDataResponseWith404Option,
+  sendErrorResponse,
+} from './utils/req-res.utils';
 
 export default class UserController {
   constructor(private userService: UserService) {}
 
-  getAllUsers = (req: Request, res: Response): void => {
-    this.userService.getAllUsers().then(
-      (data) => {
-        return res.send(data);
-      },
-      (err) => {
-        console.log('Error querying:', err);
-
-        return res.sendStatus(500);
-      },
-    );
+  getAllUsers: ControllerMethod = (req, res) => {
+    this.userService
+      .getAllUsers()
+      .then(sendDataResponse(res), sendErrorResponse(res));
   };
 
-  getUserById = (req: Request, res: Response): void => {
+  getUserById: ControllerMethod = (req, res) => {
     const { userId } = req.params;
 
-    this.userService.getUserById(userId).then(
-      (data) => {
-        if (data) {
-          return res.send(data);
-        }
-
-        return res.sendStatus(404);
-      },
-      (err) => {
-        console.log('Error querying:', err);
-
-        return res.sendStatus(500);
-      },
-    );
+    this.userService
+      .getUserById(userId)
+      .then(sendDataResponseWith404Option(res), sendErrorResponse(res));
   };
 }

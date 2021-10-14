@@ -4,6 +4,7 @@ import { Dialect } from 'sequelize/types';
 import * as dbConf from '../db.conf.json';
 import { authMiddleWare } from './middleware/auth.middleware';
 import authRouter from './routes/authentication.routes';
+import teamRouter from './routes/team.routes';
 import userRouter from './routes/user.routes';
 
 const app = express();
@@ -30,5 +31,6 @@ app.use('/auth', authRouter);
 /* Route WITH authentication */
 app.use(authMiddleWare);
 app.use('/users', userRouter);
+app.use('/teams', teamRouter);
 
 app.listen(4000);

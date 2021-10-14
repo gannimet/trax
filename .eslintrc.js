@@ -5,10 +5,11 @@ module.exports = {
     node: true,
   },
   extends: [
-    'airbnb-typescript/base',
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
     'prettier',
+    'eslint:recommended',
+    'plugin:prettier/recommended',
+    'airbnb-typescript/base',
+    'plugin:@typescript-eslint/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
