@@ -1,25 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import { tokenSecret } from '../constants';
+import { HttpErrorMessage } from '../controllers/models/http-error-message';
+import { getVerifiedUserToken } from '../controllers/utils/req-res.utils';
 
 export const authMiddleWare = (
   req: Request,
   res: Response,
   next: NextFunction,
 ): void => {
-  const authHeader = req.headers.authorization;
-
-  if (authHeader) {
-    const token = authHeader.split(' ')?.[1];
-
-    jwt.verify(token, tokenSecret, (err) => {
-      if (err) {
-        return res.sendStatus(403);
-      }
-
+  getVerifiedUserToken(req).then(
+    (user) => {
+      console.log('User making request:', user);
       next();
-    });
-  } else {
-    res.sendStatus(401);
-  }
+    },
+    (err: HttpErrorMessage) => {
+      res.sendStatus(err.statusCode);
+    },
+  );
 };

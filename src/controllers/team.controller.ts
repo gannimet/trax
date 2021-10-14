@@ -1,6 +1,7 @@
 import TeamService from '../services/team.service';
 import {
   ControllerMethod,
+  getVerifiedUserToken,
   sendDataResponse,
   sendDataResponseWith404Option,
   sendErrorResponse,
@@ -27,8 +28,11 @@ export default class TeamController {
     const { name, description } = req.body;
     const { teamId } = req.params;
 
-    this.teamService
-      .createSprint(teamId, name, description)
-      .then(sendDataResponse(res, 201), sendErrorResponse(res));
+    getVerifiedUserToken(req).then((user) => {
+      this.teamService
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        .createSprint(teamId, user.id!, name, description)
+        .then(sendDataResponse(res, 201), sendErrorResponse(res));
+    }, sendErrorResponse(res));
   };
 }
