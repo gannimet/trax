@@ -5,7 +5,6 @@ import {
   sendDataResponse,
   sendDataResponseWith404Option,
   sendDeleteResponse,
-  sendEditResponse,
   sendErrorResponse,
 } from './utils/req-res.utils';
 
@@ -66,7 +65,18 @@ export default class TeamController {
       this.teamService
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         .editSprint(teamId, sprintId, user.id!, updateObject)
-        .then(sendEditResponse(res), sendErrorResponse(res));
+        .then(() => res.sendStatus(204), sendErrorResponse(res));
     }, sendErrorResponse(res));
+  };
+
+  activateSprint: RequestHandler = (req, res) => {
+    const { teamId, sprintId } = req.params;
+
+    getVerifiedUserToken(req).then((user) => {
+      this.teamService
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        .activateSprint(teamId, sprintId, user.id!)
+        .then(() => res.sendStatus(204), sendErrorResponse(res));
+    });
   };
 }

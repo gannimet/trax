@@ -11,7 +11,7 @@ const app = express();
 const sequelize = new Sequelize({
   ...dbConf,
   dialect: dbConf.dialect as Dialect,
-  models: [__dirname + '/models'],
+  models: [__dirname + '/models/sequelize'],
 });
 
 sequelize.authenticate().then(

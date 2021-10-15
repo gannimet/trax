@@ -1,11 +1,31 @@
+import { Op } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import { HttpErrorString } from '../controllers/constants/http-error-string';
-import { HttpErrorMessage } from '../controllers/models/http-error-message';
-import Team from '../models/team';
-import TeamSprint from '../models/team-sprint';
-import TeamUser from '../models/team-user';
+import Team from '../models/sequelize/team';
+import TeamSprint from '../models/sequelize/team-sprint';
+import TeamUser from '../models/sequelize/team-user';
+import { ensureUserPermissionByQuery } from './utils/query-utils';
 
 export type TeamSprintUpdate = Pick<TeamSprint, 'name' | 'description'>;
+
+const getTeamUserEditPermissionQuery = (userId: string, teamId: string) => {
+  return TeamUser.findOne({
+    where: {
+      userId,
+      teamId,
+      canEditSprints: true,
+    },
+  });
+};
+
+const getTeamUserDeletePermissionQuery = (userId: string, teamId: string) => {
+  return TeamUser.findOne({
+    where: {
+      userId,
+      teamId,
+      canDeleteSprints: true,
+    },
+  });
+};
 
 export default class TeamService {
   getAllTeams(): Promise<Team[]> {
@@ -28,35 +48,19 @@ export default class TeamService {
     name: string,
     description?: string,
   ): Promise<TeamSprint> {
-    return TeamUser.findOne({
-      where: {
-        userId,
+    return ensureUserPermissionByQuery(
+      getTeamUserEditPermissionQuery(userId, teamId),
+    ).then(() => {
+      const id = uuidv4();
+
+      return TeamSprint.create({
+        id,
         teamId,
-        canEditSprints: true,
-      },
-    }).then(
-      (teamUser) => {
-        if (teamUser) {
-          const id = uuidv4();
-
-          return TeamSprint.create({
-            id,
-            teamId,
-            name,
-            description,
-            active: false,
-          });
-        }
-
-        return Promise.reject({
-          statusCode: 403,
-          errorMessage: HttpErrorString.MISSING_RIGHTS,
-        } as HttpErrorMessage);
-      },
-      (teamUserErr) => {
-        return Promise.reject(teamUserErr);
-      },
-    );
+        name,
+        description,
+        active: false,
+      });
+    });
   }
 
   deleteSprint(
@@ -64,31 +68,15 @@ export default class TeamService {
     sprintId: string,
     userId: string,
   ): Promise<number> {
-    return TeamUser.findOne({
-      where: {
-        userId,
-        teamId,
-        canDeleteSprints: true,
-      },
-    }).then(
-      (teamUser) => {
-        if (teamUser) {
-          return TeamSprint.destroy({
-            where: {
-              id: sprintId,
-            },
-          });
-        }
-
-        return Promise.reject({
-          statusCode: 403,
-          errorMessage: HttpErrorString.MISSING_RIGHTS,
-        } as HttpErrorMessage);
-      },
-      (teamUserErr) => {
-        return Promise.reject(teamUserErr);
-      },
-    );
+    return ensureUserPermissionByQuery(
+      getTeamUserDeletePermissionQuery(userId, teamId),
+    ).then(() => {
+      return TeamSprint.destroy({
+        where: {
+          id: sprintId,
+        },
+      });
+    });
   }
 
   editSprint(
@@ -97,28 +85,35 @@ export default class TeamService {
     userId: string,
     updateObject: TeamSprintUpdate,
   ): Promise<[number, TeamSprint[]]> {
-    return TeamUser.findOne({
-      where: {
-        userId,
-        teamId,
-        canEditSprints: true,
-      },
-    }).then(
-      (teamUser) => {
-        if (teamUser) {
-          return TeamSprint.update(updateObject, {
-            where: { id: sprintId },
-          });
-        }
+    return ensureUserPermissionByQuery(
+      getTeamUserEditPermissionQuery(userId, teamId),
+    ).then(() => {
+      return TeamSprint.update(updateObject, {
+        where: { id: sprintId },
+      });
+    });
+  }
 
-        return Promise.reject({
-          statusCode: 403,
-          errorMessage: HttpErrorString.MISSING_RIGHTS,
-        } as HttpErrorMessage);
-      },
-      (teamUserErr) => {
-        return Promise.reject(teamUserErr);
-      },
-    );
+  activateSprint(
+    teamId: string,
+    sprintId: string,
+    userId: string,
+  ): Promise<[number, TeamSprint[]]> {
+    return ensureUserPermissionByQuery(
+      getTeamUserEditPermissionQuery(userId, teamId),
+    ).then(() => {
+      return TeamSprint.update(
+        { active: true },
+        { where: { id: sprintId } },
+      ).then(
+        () => {
+          return TeamSprint.update(
+            { active: false },
+            { where: { id: { [Op.not]: sprintId } } },
+          );
+        },
+        (firstUpdateError) => Promise.reject(firstUpdateError),
+      );
+    });
   }
 }

@@ -1,8 +1,11 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { HttpErrorString } from '../controllers/constants/http-error-string';
-import { tokenSecret } from '../controllers/constants/token.constants';
-import User from '../models/user';
+import { HttpErrorString } from '../constants/http-error-string';
+import {
+  accessTokenLifetime,
+  accessTokenSecret,
+} from '../constants/token.constants';
+import User from '../models/sequelize/user';
 
 export default class AuthenticationService {
   login(username: string, password: string): Promise<string> {
@@ -20,9 +23,9 @@ export default class AuthenticationService {
                     firstName: user.firstName,
                     lastName: user.lastName,
                   },
-                  tokenSecret,
+                  accessTokenSecret,
                   {
-                    expiresIn: '12h',
+                    expiresIn: accessTokenLifetime,
                   },
                 );
 

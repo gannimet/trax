@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import User from '../../models/user';
-import { HttpErrorString } from '../constants/http-error-string';
-import { tokenSecret } from '../constants/token.constants';
+import { HttpErrorString } from '../../constants/http-error-string';
+import { accessTokenSecret } from '../../constants/token.constants';
+import User from '../../models/sequelize/user';
 import { HttpErrorMessage } from '../models/http-error-message';
 
 /**
@@ -98,10 +98,10 @@ export const sendDeleteResponse = (res: Response, expectedCount = 1) => {
 /**
  * Helper method for controllers to map the number of updated entries of an update
  * operation to an HTTP response. Use this method if your operation returns an array
- * containing the update count and optionally the list of updated entities, in that order.
+ * containing the update count and optionally the list of updated entities, in that order
+ * and you know exactly how many entries your operation is supposed to affect.
  * @param res Response channel to use
  * @param expectedCount The number of entries you expect to be updated by the operation
- * (1 by default)
  * @returns A function that can be used as a callback handler, e. g. in a
  * Promise.then() call. The function will use the update count it received to determine
  * the appropriate response status code. If the count is equal to expectedCount, a 200
@@ -118,7 +118,7 @@ export const sendDeleteResponse = (res: Response, expectedCount = 1) => {
  * })
  * ```
  */
-export const sendEditResponse = <E>(res: Response, expectedCount = 1) => {
+export const sendEditResponse = <E>(res: Response, expectedCount: number) => {
   return ([updateCount, updatedEntities]: [number, E[]]): Response => {
     if (updateCount === expectedCount) {
       return res.status(200).send(updatedEntities);
@@ -219,7 +219,7 @@ export const getVerifiedUserToken = (
         } as HttpErrorMessage);
       }
 
-      jwt.verify(token, tokenSecret, (err, user) => {
+      jwt.verify(token, accessTokenSecret, (err, user) => {
         if (err) {
           return reject({
             statusCode: 403,
