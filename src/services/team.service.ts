@@ -5,6 +5,8 @@ import Team from '../models/team';
 import TeamSprint from '../models/team-sprint';
 import TeamUser from '../models/team-user';
 
+export type TeamSprintUpdate = Pick<TeamSprint, 'name' | 'description'>;
+
 export default class TeamService {
   getAllTeams(): Promise<Team[]> {
     return Team.findAll();
@@ -35,7 +37,15 @@ export default class TeamService {
     }).then(
       (teamUser) => {
         if (teamUser) {
-          return this.createSprintLegitimized(teamId, name, description);
+          const id = uuidv4();
+
+          return TeamSprint.create({
+            id,
+            teamId,
+            name,
+            description,
+            active: false,
+          });
         }
 
         return Promise.reject({
@@ -63,7 +73,11 @@ export default class TeamService {
     }).then(
       (teamUser) => {
         if (teamUser) {
-          return this.deleteSprintLegitimized(sprintId);
+          return TeamSprint.destroy({
+            where: {
+              id: sprintId,
+            },
+          });
         }
 
         return Promise.reject({
@@ -77,27 +91,34 @@ export default class TeamService {
     );
   }
 
-  private createSprintLegitimized(
+  editSprint(
     teamId: string,
-    name: string,
-    description?: string,
-  ): Promise<TeamSprint> {
-    const id = uuidv4();
-
-    return TeamSprint.create({
-      id,
-      teamId,
-      name,
-      description,
-      active: false,
-    });
-  }
-
-  private deleteSprintLegitimized(sprintId: string): Promise<number> {
-    return TeamSprint.destroy({
+    sprintId: string,
+    userId: string,
+    updateObject: TeamSprintUpdate,
+  ): Promise<[number, TeamSprint[]]> {
+    return TeamUser.findOne({
       where: {
-        id: sprintId,
+        userId,
+        teamId,
+        canEditSprints: true,
       },
-    });
+    }).then(
+      (teamUser) => {
+        if (teamUser) {
+          return TeamSprint.update(updateObject, {
+            where: { id: sprintId },
+          });
+        }
+
+        return Promise.reject({
+          statusCode: 403,
+          errorMessage: HttpErrorString.MISSING_RIGHTS,
+        } as HttpErrorMessage);
+      },
+      (teamUserErr) => {
+        return Promise.reject(teamUserErr);
+      },
+    );
   }
 }

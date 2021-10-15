@@ -1,10 +1,11 @@
 import { RequestHandler } from 'express';
-import TeamService from '../services/team.service';
+import TeamService, { TeamSprintUpdate } from '../services/team.service';
 import {
   getVerifiedUserToken,
   sendDataResponse,
   sendDataResponseWith404Option,
   sendDeleteResponse,
+  sendEditResponse,
   sendErrorResponse,
 } from './utils/req-res.utils';
 
@@ -45,6 +46,27 @@ export default class TeamController {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         .deleteSprint(teamId, sprintId, user.id!)
         .then(sendDeleteResponse(res), sendErrorResponse(res));
+    }, sendErrorResponse(res));
+  };
+
+  editSprint: RequestHandler = (req, res) => {
+    const { teamId, sprintId } = req.params;
+    const { name, description } = req.body;
+    const updateObject: TeamSprintUpdate = {};
+
+    if (name != null) {
+      updateObject.name = name;
+    }
+
+    if (description != null) {
+      updateObject.description = description;
+    }
+
+    getVerifiedUserToken(req).then((user) => {
+      this.teamService
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        .editSprint(teamId, sprintId, user.id!, updateObject)
+        .then(sendEditResponse(res), sendErrorResponse(res));
     }, sendErrorResponse(res));
   };
 }

@@ -28,7 +28,7 @@ app.use(json());
 /* Routes with NO authentication */
 app.use('/auth', authRouter);
 
-/* Route WITH authentication */
+/* Routes WITH authentication */
 app.use(authMiddleWare);
 app.use('/users', userRouter);
 app.use('/teams', teamRouter);

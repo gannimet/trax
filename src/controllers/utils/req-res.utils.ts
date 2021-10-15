@@ -61,14 +61,15 @@ export const sendDataResponseWith404Option = <E>(
 
 /**
  * Helper method for controllers to map the delete count of a delete operation
- * to an HTTP response. Use this method if you expect the delete count of the operation
- * to be 1.
+ * to an HTTP response. Use this method if your operation returns the delete count.
  * @param res Response channel to use
+ * @param expectedCount The number of entries you expect to be deleted by the operation
+ * (1 by default)
  * @returns A function that can be used as a callback handler, e. g. in a
  * Promise.then() call. The function will use the delete count it received to determine
- * the appropriate response status code. If the count is exactly 1, a 204 response will be sent.
- * If it is 0, a 404 response will be sent. In every other case, a 400 response container the error
- * string 'AMBIGUOUS_REQUEST' will be sent.
+ * the appropriate response status code. If the count is equal to expectedCount, a 204
+ * response will be sent. If it is 0, a 404 response will be sent. In every other case,
+ * a 400 response containing the error string 'AMBIGUOUS_REQUEST' will be sent.
  * @example
  * ```typescript
  * router.get('/', (req, res) => {
@@ -76,13 +77,54 @@ export const sendDataResponseWith404Option = <E>(
  * })
  * ```
  */
-export const sendDeleteResponse = (res: Response) => {
+export const sendDeleteResponse = (res: Response, expectedCount = 1) => {
   return (deleteCount: number): Response => {
-    if (deleteCount === 1) {
+    if (deleteCount === expectedCount) {
       return res.sendStatus(204);
     }
 
-    if (deleteCount < 1) {
+    if (deleteCount === 0) {
+      return res.status(404).send({
+        error: HttpErrorString.RESOURCE_NOT_FOUND,
+      });
+    }
+
+    return res.status(400).send({
+      error: HttpErrorString.AMBIGIOUS_REQUEST,
+    });
+  };
+};
+
+/**
+ * Helper method for controllers to map the number of updated entries of an update
+ * operation to an HTTP response. Use this method if your operation returns an array
+ * containing the update count and optionally the list of updated entities, in that order.
+ * @param res Response channel to use
+ * @param expectedCount The number of entries you expect to be updated by the operation
+ * (1 by default)
+ * @returns A function that can be used as a callback handler, e. g. in a
+ * Promise.then() call. The function will use the update count it received to determine
+ * the appropriate response status code. If the count is equal to expectedCount, a 200
+ * response will be sent. If it is 0, a 404 response will
+ * be sent. In every other case, a 400 response containing the error string
+ * 'AMBIGUOUS_REQUEST' will be sent.
+ *
+ * Note: In case a 200 response is sent, it will only contain the affected entities
+ * for postgres and mssql databases with `options.returning` true. See sequelize docs.
+ * @example
+ * ```typescript
+ * router.get('/', (req, res) => {
+ *   service.executeDBQuery().then(sendEditResponse(res));
+ * })
+ * ```
+ */
+export const sendEditResponse = <E>(res: Response, expectedCount = 1) => {
+  return ([updateCount, updatedEntities]: [number, E[]]): Response => {
+    if (updateCount === expectedCount) {
+      return res.status(200).send(updatedEntities);
+    }
+
+    if (updateCount === 0) {
       return res.status(404).send({
         error: HttpErrorString.RESOURCE_NOT_FOUND,
       });
@@ -114,7 +156,7 @@ const isHttpErrorMessage = (
  * @example
  * ```typescript
  * router.get('/', (req, res) => {
- *   service.executeDBQuery().then(sendErrorResponse(res));
+ *   service.executeDBQuery().then(() => {}, sendErrorResponse(res));
  * })
  * ```
  */
@@ -169,6 +211,13 @@ export const getVerifiedUserToken = (
   return new Promise((resolve, reject) => {
     if (authHeader) {
       const token = authHeader.split(' ')?.[1];
+
+      if (!token) {
+        return reject({
+          statusCode: 403,
+          errorMessage: HttpErrorString.INVALID_CREDENTIALS,
+        } as HttpErrorMessage);
+      }
 
       jwt.verify(token, tokenSecret, (err, user) => {
         if (err) {

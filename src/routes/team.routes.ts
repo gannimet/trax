@@ -9,5 +9,6 @@ teamRouter.get('/', teamController.getAllTeams);
 teamRouter.get('/:teamId', teamController.getTeamById);
 teamRouter.post('/:teamId/sprints', teamController.createSprint);
 teamRouter.delete('/:teamId/sprints/:sprintId', teamController.deleteSprint);
+teamRouter.put('/:teamId/sprints/:sprintId', teamController.editSprint);
 
 export default teamRouter;
