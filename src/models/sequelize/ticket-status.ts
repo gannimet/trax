@@ -3,6 +3,7 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
@@ -12,6 +13,7 @@ import Team from './team';
 @Table({
   timestamps: false,
   underscored: true,
+  tableName: 'TicketStatus',
 })
 export default class TicketStatus extends Model {
   @PrimaryKey
@@ -27,4 +29,7 @@ export default class TicketStatus extends Model {
 
   @BelongsTo(() => Team)
   team?: Team;
+
+  @HasMany(() => Team)
+  initialStatusForTeam?: Team;
 }

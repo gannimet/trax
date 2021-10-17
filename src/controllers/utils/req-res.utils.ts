@@ -200,8 +200,11 @@ export type TokenUserPartial = Pick<
 /**
  * Returns the verified, decoded access token from the HTTP request, if one exists.
  * @param req The request containing the bearer token in the Authorization header
- * @returns The decoded token, which is verified against the token secret and safe
- * to use to identify the user making he request.
+ * @returns A promise resolving with the decoded token, which is verified against
+ * the token secret and safe to use to identify the user making he request. If the
+ * token could not be verified, the promise will be rejected with a 403 HTTP error.
+ * If no token was found in the request header, the promise will be rejected with a
+ * 401 HTTP error.
  */
 export const getVerifiedUserToken = (
   req: Request,

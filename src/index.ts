@@ -5,6 +5,7 @@ import * as dbConf from '../db.conf.json';
 import { authMiddleWare } from './middleware/auth.middleware';
 import authRouter from './routes/authentication.routes';
 import teamRouter from './routes/team.routes';
+import ticketRouter from './routes/ticket.routes';
 import userRouter from './routes/user.routes';
 
 const app = express();
@@ -32,5 +33,6 @@ app.use('/auth', authRouter);
 app.use(authMiddleWare);
 app.use('/users', userRouter);
 app.use('/teams', teamRouter);
+app.use('/tickets', ticketRouter);
 
 app.listen(4000);

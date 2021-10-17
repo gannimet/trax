@@ -1,7 +1,9 @@
 import {
+  BelongsTo,
   BelongsToMany,
   Column,
   DataType,
+  ForeignKey,
   HasMany,
   Model,
   PrimaryKey,
@@ -9,6 +11,7 @@ import {
 } from 'sequelize-typescript';
 import TeamSprint from './team-sprint';
 import TeamUser from './team-user';
+import TicketStatus from './ticket-status';
 import User from './user';
 
 @Table({
@@ -34,4 +37,11 @@ export default class Team extends Model {
 
   @HasMany(() => TeamSprint)
   sprints?: TeamSprint[];
+
+  @ForeignKey(() => TicketStatus)
+  @Column(DataType.STRING)
+  initialTicketStatusId?: string;
+
+  @BelongsTo(() => TicketStatus)
+  initialTicketStatus?: TicketStatus;
 }

@@ -25,6 +25,17 @@ export default class TeamController {
       .then(sendDataResponseWith404Option(res), sendErrorResponse(res));
   };
 
+  createTeam: RequestHandler = (req, res) => {
+    const { name, description } = req.body;
+
+    getVerifiedUserToken(req).then((user) => {
+      this.teamService
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        .createTeam(user.id!, name, description)
+        .then(sendDataResponse(res, 201), sendErrorResponse(res));
+    }, sendErrorResponse(res));
+  };
+
   createSprint: RequestHandler = (req, res) => {
     const { name, description } = req.body;
     const { teamId } = req.params;
@@ -77,6 +88,6 @@ export default class TeamController {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         .activateSprint(teamId, sprintId, user.id!)
         .then(() => res.sendStatus(204), sendErrorResponse(res));
-    });
+    }, sendErrorResponse(res));
   };
 }

@@ -12,6 +12,7 @@ import TicketStatus from './ticket-status';
 @Table({
   timestamps: false,
   underscored: true,
+  tableName: 'TicketStatusTransitions',
 })
 export default class TicketStatusTransition extends Model {
   @PrimaryKey
