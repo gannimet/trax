@@ -10,6 +10,8 @@ export const authMiddleWare = (
   getVerifiedUserToken(req).then(
     (user) => {
       console.log('User making request:', user);
+      res.locals.authenticatedUser = user;
+
       next();
     },
     (err: HttpErrorMessage) => {

@@ -1,6 +1,12 @@
 import { RequestHandler } from 'express';
+import { HttpErrorString } from '../constants/http-error-string';
 import TicketService from '../services/ticket.service';
-import { sendDataResponse, sendErrorResponse } from './utils/req-res.utils';
+import { HttpErrorMessage } from './models/http-error-message';
+import {
+  sendDataResponse,
+  sendDataResponseWith404Option,
+  sendErrorResponse,
+} from './utils/req-res.utils';
 
 export default class TicketController {
   constructor(private ticketService: TicketService) {}
@@ -11,5 +17,21 @@ export default class TicketController {
     this.ticketService
       .getTicketsBySprint(sprintId)
       .then(sendDataResponse(res), sendErrorResponse(res));
+  };
+
+  getTicketByIssueNumber: RequestHandler = (req, res) => {
+    const { issueNumber } = req.params;
+    const numericalIssueNumber = parseInt(issueNumber, 10);
+
+    if (Number.isNaN(numericalIssueNumber)) {
+      return res.status(400).send({
+        statusCode: 400,
+        errorMessage: HttpErrorString.INVALID_PARAMETER,
+      } as HttpErrorMessage);
+    }
+
+    this.ticketService
+      .getTicketByIssueNumber(numericalIssueNumber)
+      .then(sendDataResponseWith404Option(res), sendErrorResponse(res));
   };
 }

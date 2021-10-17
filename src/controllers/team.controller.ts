@@ -1,7 +1,6 @@
 import { RequestHandler } from 'express';
 import TeamService, { TeamSprintUpdate } from '../services/team.service';
 import {
-  getVerifiedUserToken,
   sendDataResponse,
   sendDataResponseWith404Option,
   sendDeleteResponse,
@@ -27,41 +26,37 @@ export default class TeamController {
 
   createTeam: RequestHandler = (req, res) => {
     const { name, description } = req.body;
+    const { authenticatedUser } = res.locals;
 
-    getVerifiedUserToken(req).then((user) => {
-      this.teamService
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        .createTeam(user.id!, name, description)
-        .then(sendDataResponse(res, 201), sendErrorResponse(res));
-    }, sendErrorResponse(res));
+    this.teamService
+      .createTeam(authenticatedUser.id, name, description)
+      .then(sendDataResponse(res, 201), sendErrorResponse(res));
   };
 
   createSprint: RequestHandler = (req, res) => {
     const { name, description } = req.body;
     const { teamId } = req.params;
+    const { authenticatedUser } = res.locals;
 
-    getVerifiedUserToken(req).then((user) => {
-      this.teamService
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        .createSprint(teamId, user.id!, name, description)
-        .then(sendDataResponse(res, 201), sendErrorResponse(res));
-    }, sendErrorResponse(res));
+    this.teamService
+      .createSprint(teamId, authenticatedUser.id, name, description)
+      .then(sendDataResponse(res, 201), sendErrorResponse(res));
   };
 
   deleteSprint: RequestHandler = (req, res) => {
     const { teamId, sprintId } = req.params;
+    const { authenticatedUser } = res.locals;
 
-    getVerifiedUserToken(req).then((user) => {
-      this.teamService
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        .deleteSprint(teamId, sprintId, user.id!)
-        .then(sendDeleteResponse(res), sendErrorResponse(res));
-    }, sendErrorResponse(res));
+    this.teamService
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      .deleteSprint(teamId, sprintId, authenticatedUser.id)
+      .then(sendDeleteResponse(res), sendErrorResponse(res));
   };
 
   editSprint: RequestHandler = (req, res) => {
     const { teamId, sprintId } = req.params;
     const { name, description } = req.body;
+    const { authenticatedUser } = res.locals;
     const updateObject: TeamSprintUpdate = {};
 
     if (name != null) {
@@ -72,22 +67,18 @@ export default class TeamController {
       updateObject.description = description;
     }
 
-    getVerifiedUserToken(req).then((user) => {
-      this.teamService
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        .editSprint(teamId, sprintId, user.id!, updateObject)
-        .then(() => res.sendStatus(204), sendErrorResponse(res));
-    }, sendErrorResponse(res));
+    this.teamService
+      .editSprint(teamId, sprintId, authenticatedUser.id, updateObject)
+      .then(() => res.sendStatus(204), sendErrorResponse(res));
   };
 
   activateSprint: RequestHandler = (req, res) => {
     const { teamId, sprintId } = req.params;
+    const { authenticatedUser } = res.locals;
 
-    getVerifiedUserToken(req).then((user) => {
-      this.teamService
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        .activateSprint(teamId, sprintId, user.id!)
-        .then(() => res.sendStatus(204), sendErrorResponse(res));
-    }, sendErrorResponse(res));
+    this.teamService
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      .activateSprint(teamId, sprintId, authenticatedUser.id)
+      .then(() => res.sendStatus(204), sendErrorResponse(res));
   };
 }

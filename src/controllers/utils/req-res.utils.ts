@@ -55,7 +55,7 @@ export const sendDataResponseWith404Option = <E>(
       return res.status(successStatus).send(data);
     }
 
-    return res.status(404).send(HttpErrorString.RESOURCE_NOT_FOUND);
+    return res.status(404).send({ error: HttpErrorString.RESOURCE_NOT_FOUND });
   };
 };
 
