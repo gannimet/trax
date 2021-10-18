@@ -34,4 +34,19 @@ export default class TicketController {
       .getTicketByIssueNumber(numericalIssueNumber)
       .then(sendDataResponseWith404Option(res), sendErrorResponse(res));
   };
+
+  createTicket: RequestHandler = (req, res) => {
+    const { title, description, sprintId, assigneeId } = req.body;
+    const { authenticatedUser } = res.locals;
+
+    this.ticketService
+      .createTicket(
+        sprintId,
+        authenticatedUser.id,
+        title,
+        description,
+        assigneeId,
+      )
+      .then(sendDataResponse(res, 201), sendErrorResponse(res));
+  };
 }

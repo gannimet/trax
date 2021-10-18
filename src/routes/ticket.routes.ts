@@ -10,5 +10,6 @@ ticketRouter.get(
   '/byissue/:issueNumber',
   ticketController.getTicketByIssueNumber,
 );
+ticketRouter.post('/', ticketController.createTicket);
 
 export default ticketRouter;
