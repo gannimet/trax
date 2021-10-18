@@ -24,7 +24,7 @@ export default class TicketController {
     const numericalIssueNumber = parseInt(issueNumber, 10);
 
     if (Number.isNaN(numericalIssueNumber)) {
-      return res.status(400).send({
+      return res.status(400).json({
         statusCode: 400,
         errorMessage: HttpErrorString.INVALID_PARAMETER,
       } as HttpErrorMessage);

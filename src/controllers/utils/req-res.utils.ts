@@ -23,7 +23,7 @@ import { HttpErrorMessage } from '../models/http-error-message';
  */
 export const sendDataResponse = <E>(res: Response, successStatus = 200) => {
   return (data: E): Response => {
-    return res.status(successStatus).send(data);
+    return res.status(successStatus).json(data);
   };
 };
 
@@ -52,10 +52,10 @@ export const sendDataResponseWith404Option = <E>(
 ) => {
   return (data: E | null): Response => {
     if (data) {
-      return res.status(successStatus).send(data);
+      return res.status(successStatus).json(data);
     }
 
-    return res.status(404).send({ error: HttpErrorString.RESOURCE_NOT_FOUND });
+    return res.status(404).json({ error: HttpErrorString.RESOURCE_NOT_FOUND });
   };
 };
 
@@ -84,12 +84,12 @@ export const sendDeleteResponse = (res: Response, expectedCount = 1) => {
     }
 
     if (deleteCount === 0) {
-      return res.status(404).send({
+      return res.status(404).json({
         error: HttpErrorString.RESOURCE_NOT_FOUND,
       });
     }
 
-    return res.status(400).send({
+    return res.status(400).json({
       error: HttpErrorString.AMBIGIOUS_REQUEST,
     });
   };
@@ -121,16 +121,16 @@ export const sendDeleteResponse = (res: Response, expectedCount = 1) => {
 export const sendEditResponse = <E>(res: Response, expectedCount: number) => {
   return ([updateCount, updatedEntities]: [number, E[]]): Response => {
     if (updateCount === expectedCount) {
-      return res.status(200).send(updatedEntities);
+      return res.status(200).json(updatedEntities);
     }
 
     if (updateCount === 0) {
-      return res.status(404).send({
+      return res.status(404).json({
         error: HttpErrorString.RESOURCE_NOT_FOUND,
       });
     }
 
-    return res.status(400).send({
+    return res.status(400).json({
       error: HttpErrorString.AMBIGIOUS_REQUEST,
     });
   };
@@ -176,7 +176,7 @@ export const sendErrorResponse = (res: Response, status = 500) => {
 
     console.log('sending error message:', errorMessage);
 
-    return res.status(errorStatus).send({ error: errorMessage });
+    return res.status(errorStatus).json({ error: errorMessage });
   };
 };
 

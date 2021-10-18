@@ -9,10 +9,10 @@ export default class AuthenticationController {
 
     this.authService.login(username, password).then(
       (accessToken) => {
-        res.send({ accessToken });
+        res.json({ accessToken });
       },
       (error) => {
-        res.status(403).send({ error });
+        res.status(403).json({ error });
       },
     );
   };
