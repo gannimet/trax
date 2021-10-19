@@ -171,10 +171,8 @@ export const sendErrorResponse = (res: Response, status = 500) => {
       errorMessage = error.errorMessage;
       errorStatus = error.statusCode;
     } else {
-      errorMessage = `${error.name} - ${error.message}` ?? error;
+      errorMessage = `${error.name} - ${error.message}`;
     }
-
-    console.log('sending error message:', errorMessage);
 
     return res.status(errorStatus).json({ error: errorMessage });
   };

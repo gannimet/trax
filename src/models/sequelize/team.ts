@@ -30,7 +30,7 @@ export default class Team extends Model {
   description?: string;
 
   @Column(DataType.BLOB)
-  avatar?: Blob;
+  avatar?: Buffer;
 
   @BelongsToMany(() => User, () => TeamUser)
   users?: User[];

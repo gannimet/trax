@@ -34,7 +34,7 @@ export default class User extends Model {
   emailVerified?: boolean;
 
   @Column(DataType.BLOB)
-  avatar?: Blob;
+  avatar?: Buffer;
 
   @Column(DataType.STRING)
   password?: string;
