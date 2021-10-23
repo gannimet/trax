@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express, { json } from 'express';
 import { Sequelize } from 'sequelize-typescript';
 import { Dialect } from 'sequelize/types';
@@ -25,6 +26,7 @@ sequelize.authenticate().then(
 );
 
 app.use(json());
+app.use(cors());
 
 /* Routes with NO authentication */
 app.use('/auth', authRouter);
