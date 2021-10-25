@@ -8,5 +8,6 @@ const userController = new UserController(new UserService());
 userRouter.get('/', userController.getAllUsers);
 userRouter.get('/:userId', userController.getUserById);
 userRouter.get('/:userId/teams', userController.getAllTeamsByUser);
+userRouter.get('/:userId/teams/:teamId', userController.getTeamDetailsForUser);
 
 export default userRouter;

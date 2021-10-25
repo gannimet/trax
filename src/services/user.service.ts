@@ -33,4 +33,21 @@ export default class UserService {
       },
     });
   }
+
+  getTeamDetailsForUser(
+    userId: string,
+    teamId: string,
+  ): Promise<TeamUser | null> {
+    return TeamUser.findOne({
+      where: {
+        userId,
+        teamId,
+      },
+      include: {
+        all: true,
+        nested: true,
+        attributes: { exclude: ['password'] },
+      },
+    });
+  }
 }
