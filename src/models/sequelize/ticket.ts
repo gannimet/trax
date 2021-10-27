@@ -12,6 +12,7 @@ import {
 } from 'sequelize-typescript';
 import TeamSprint from './team-sprint';
 import TicketStatus from './ticket-status';
+import TicketType from './ticket-type';
 import User from './user';
 
 @Table({
@@ -65,4 +66,11 @@ export default class Ticket extends Model {
 
   @BelongsTo(() => TeamSprint)
   sprint?: TeamSprint;
+
+  @ForeignKey(() => TicketType)
+  @Column(DataType.STRING)
+  typeId?: string;
+
+  @BelongsTo(() => TicketType)
+  ticketType?: TicketType;
 }
