@@ -1,6 +1,7 @@
 import {
   AutoIncrement,
   BelongsTo,
+  BelongsToMany,
   Column,
   CreatedAt,
   DataType,
@@ -10,8 +11,10 @@ import {
   Table,
   Unique,
 } from 'sequelize-typescript';
+import Tag from './tag';
 import TeamSprint from './team-sprint';
 import TicketStatus from './ticket-status';
+import TicketTag from './ticket-tag';
 import TicketType from './ticket-type';
 import User from './user';
 
@@ -34,23 +37,18 @@ export default class Ticket extends Model {
   @Column(DataType.DATE)
   createdAt?: Date;
 
+  @Column(DataType.INTEGER)
+  estimate?: number;
+
   @Unique
   @AutoIncrement
   @Column(DataType.INTEGER)
   issueNumber?: number;
 
-  @ForeignKey(() => User)
-  @Column(DataType.STRING)
-  authorId?: string;
-
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, 'authorId')
   author?: User;
 
-  @ForeignKey(() => User)
-  @Column(DataType.STRING)
-  assigneeId?: string;
-
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, 'assigneeId')
   assignee?: User;
 
   @ForeignKey(() => TicketStatus)
@@ -64,13 +62,12 @@ export default class Ticket extends Model {
   @Column(DataType.STRING)
   sprintId?: string;
 
-  @BelongsTo(() => TeamSprint)
+  @BelongsTo(() => TeamSprint, 'sprintId')
   sprint?: TeamSprint;
 
-  @ForeignKey(() => TicketType)
-  @Column(DataType.STRING)
-  typeId?: string;
-
-  @BelongsTo(() => TicketType)
+  @BelongsTo(() => TicketType, 'typeId')
   ticketType?: TicketType;
+
+  @BelongsToMany(() => Tag, () => TicketTag)
+  tags?: Tag[];
 }
