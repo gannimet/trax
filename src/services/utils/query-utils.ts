@@ -51,3 +51,5 @@ export const ensureNonEmptyListQueryResult = <R>(
     (queryError) => Promise.reject(queryError),
   );
 };
+
+export const userExcludedAttributes = ['password', 'email'];

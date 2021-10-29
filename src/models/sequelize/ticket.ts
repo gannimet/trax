@@ -6,6 +6,7 @@ import {
   CreatedAt,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
@@ -13,6 +14,8 @@ import {
 } from 'sequelize-typescript';
 import Tag from './tag';
 import TeamSprint from './team-sprint';
+import TicketComment from './ticket-comment';
+import TicketEdit from './ticket-edit';
 import TicketStatus from './ticket-status';
 import TicketTag from './ticket-tag';
 import TicketType from './ticket-type';
@@ -70,4 +73,10 @@ export default class Ticket extends Model {
 
   @BelongsToMany(() => Tag, () => TicketTag)
   tags?: Tag[];
+
+  @HasMany(() => TicketEdit)
+  edits?: TicketEdit[];
+
+  @HasMany(() => TicketComment)
+  comments?: TicketComment[];
 }

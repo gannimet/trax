@@ -8,11 +8,13 @@ import {
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
+import Ticket from './ticket';
 import User from './user';
 
 @Table({
   timestamps: false,
   underscored: true,
+  tableName: 'TicketComments',
 })
 export default class TicketComment extends Model {
   @PrimaryKey
@@ -32,4 +34,11 @@ export default class TicketComment extends Model {
 
   @BelongsTo(() => User)
   author?: User;
+
+  @ForeignKey(() => Ticket)
+  @Column(DataType.STRING)
+  ticketId?: string;
+
+  @BelongsTo(() => Ticket)
+  ticket?: Ticket;
 }

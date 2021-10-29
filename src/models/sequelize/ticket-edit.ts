@@ -8,12 +8,12 @@ import {
   Table,
 } from 'sequelize-typescript';
 import Ticket from './ticket';
-import TicketEditableField from './ticket-editable-field';
 import User from './user';
 
 @Table({
   timestamps: false,
   underscored: true,
+  tableName: 'TicketEdits',
 })
 export default class TicketEdit extends Model {
   @PrimaryKey
@@ -43,10 +43,13 @@ export default class TicketEdit extends Model {
   @BelongsTo(() => Ticket)
   ticket?: Ticket;
 
-  @ForeignKey(() => TicketEditableField)
   @Column(DataType.STRING)
-  fieldId?: string;
-
-  @BelongsTo(() => TicketEditableField)
-  field?: TicketEditableField;
+  field?:
+    | 'TITLE'
+    | 'DESCRIPTION'
+    | 'ASSIGNEE'
+    | 'SPRINT'
+    | 'STATUS'
+    | 'TAGS'
+    | 'TYPE';
 }

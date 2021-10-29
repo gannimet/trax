@@ -3,9 +3,11 @@ import { HttpErrorMessage } from '../controllers/models/http-error-message';
 import Team from '../models/sequelize/team';
 import TeamSprint from '../models/sequelize/team-sprint';
 import Ticket from '../models/sequelize/ticket';
-import TicketStatus from '../models/sequelize/ticket-status';
-import User from '../models/sequelize/user';
-import { createUUID, ensureQueryResult } from './utils/query-utils';
+import {
+  createUUID,
+  ensureQueryResult,
+  userExcludedAttributes,
+} from './utils/query-utils';
 
 export default class TicketService {
   getTicketsBySprint(sprintId: string): Promise<Ticket[]> {
@@ -27,11 +29,11 @@ export default class TicketService {
       where: {
         issueNumber,
       },
-      include: [
-        { model: User, as: 'assignee' },
-        { model: User, as: 'author' },
-        TicketStatus,
-      ],
+      include: {
+        all: true,
+        nested: true,
+        attributes: { exclude: userExcludedAttributes },
+      },
     });
   }
 
