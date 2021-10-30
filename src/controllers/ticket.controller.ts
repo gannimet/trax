@@ -49,4 +49,14 @@ export default class TicketController {
       )
       .then(sendDataResponse(res, 201), sendErrorResponse(res));
   };
+
+  addTicketComment: RequestHandler = (req, res) => {
+    const { text } = req.body;
+    const { ticketId } = req.params;
+    const { authenticatedUser } = res.locals;
+
+    this.ticketService
+      .addTicketComment(ticketId, authenticatedUser.id, text)
+      .then(sendDataResponseWith404Option(res), sendErrorResponse(res));
+  };
 }

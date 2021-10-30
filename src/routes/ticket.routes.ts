@@ -11,5 +11,6 @@ ticketRouter.get(
   ticketController.getTicketByIssueNumber,
 );
 ticketRouter.post('/', ticketController.createTicket);
+ticketRouter.post('/:ticketId/comments', ticketController.addTicketComment);
 
 export default ticketRouter;

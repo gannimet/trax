@@ -3,6 +3,7 @@ import { HttpErrorMessage } from '../controllers/models/http-error-message';
 import Team from '../models/sequelize/team';
 import TeamSprint from '../models/sequelize/team-sprint';
 import Ticket from '../models/sequelize/ticket';
+import TicketComment from '../models/sequelize/ticket-comment';
 import {
   createUUID,
   ensureQueryResult,
@@ -71,6 +72,30 @@ export default class TicketService {
         createdAt: new Date(),
         statusId: initialTicketStatusId,
         sprintId,
+      });
+    });
+  }
+
+  addTicketComment(
+    ticketId: string,
+    authorId: string,
+    text: string,
+  ): Promise<Ticket | null> {
+    const id = createUUID();
+
+    return TicketComment.create({
+      id,
+      ticketId,
+      authorId,
+      text,
+      createdAt: new Date(),
+    }).then(() => {
+      return Ticket.findByPk(ticketId, {
+        include: {
+          all: true,
+          nested: true,
+          attributes: { exclude: userExcludedAttributes },
+        },
       });
     });
   }
