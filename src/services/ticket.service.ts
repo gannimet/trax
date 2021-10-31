@@ -1,9 +1,14 @@
 import { HttpErrorString } from '../constants/http-error-string';
 import { HttpErrorMessage } from '../controllers/models/http-error-message';
+import Tag from '../models/sequelize/tag';
 import Team from '../models/sequelize/team';
 import TeamSprint from '../models/sequelize/team-sprint';
 import Ticket from '../models/sequelize/ticket';
 import TicketComment from '../models/sequelize/ticket-comment';
+import TicketEdit from '../models/sequelize/ticket-edit';
+import TicketStatus from '../models/sequelize/ticket-status';
+import TicketType from '../models/sequelize/ticket-type';
+import User from '../models/sequelize/user';
 import {
   createUUID,
   ensureQueryResult,
@@ -30,11 +35,44 @@ export default class TicketService {
       where: {
         issueNumber,
       },
-      include: {
-        all: true,
-        nested: true,
-        attributes: { exclude: userExcludedAttributes },
-      },
+      include: [
+        {
+          model: User,
+          as: 'author',
+          foreignKey: 'authorId',
+          attributes: { exclude: userExcludedAttributes },
+        },
+        {
+          model: User,
+          as: 'assignee',
+          foreignKey: 'assigneeId',
+          attributes: { exclude: userExcludedAttributes },
+        },
+        {
+          model: TicketStatus,
+          foreignKey: 'statusId',
+        },
+        {
+          model: TicketType,
+          foreignKey: 'typeId',
+        },
+        {
+          model: TicketComment,
+          include: [
+            {
+              model: User,
+              as: 'author',
+              attributes: { exclude: userExcludedAttributes },
+            },
+          ],
+        },
+        {
+          model: Tag,
+        },
+        {
+          model: TicketEdit,
+        },
+      ],
     });
   }
 

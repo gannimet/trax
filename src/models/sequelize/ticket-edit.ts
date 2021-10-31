@@ -7,10 +7,10 @@ import {
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
+import Tag from './tag';
 import TeamSprint from './team-sprint';
 import Ticket from './ticket';
 import TicketStatus from './ticket-status';
-import TicketTag from './ticket-tag';
 import TicketType from './ticket-type';
 import User from './user';
 
@@ -62,62 +62,62 @@ export default class TicketEdit extends Model {
   @Column(DataType.STRING)
   previousAssigneeId?: string;
 
-  @BelongsTo(() => User, 'previousAssigneeId')
+  @BelongsTo(() => User)
   previousAssignee?: User;
 
   @ForeignKey(() => User)
   @Column(DataType.STRING)
   newAssigneeId?: string;
 
-  @BelongsTo(() => User, 'newAssigneeId')
+  @BelongsTo(() => User)
   newAssignee?: User;
 
   @ForeignKey(() => TeamSprint)
   @Column(DataType.STRING)
   previousSprintId?: string;
 
-  @BelongsTo(() => TeamSprint, 'previousSprintId')
+  @BelongsTo(() => TeamSprint)
   previousSprint?: TeamSprint;
 
   @ForeignKey(() => TeamSprint)
   @Column(DataType.STRING)
   newSprintId?: string;
 
-  @BelongsTo(() => TeamSprint, 'newSprintId')
+  @BelongsTo(() => TeamSprint)
   newSprint?: TeamSprint;
 
   @ForeignKey(() => TicketStatus)
   @Column(DataType.STRING)
   previousStatusId?: string;
 
-  @BelongsTo(() => TicketStatus, 'previousStatusId')
+  @BelongsTo(() => TicketStatus)
   previousStatus?: TicketStatus;
 
   @ForeignKey(() => TicketStatus)
   @Column(DataType.STRING)
   newStatusId?: string;
 
-  @BelongsTo(() => TicketStatus, 'newStatusId')
+  @BelongsTo(() => TicketStatus)
   newStatus?: TicketStatus;
 
   @ForeignKey(() => TicketType)
   @Column(DataType.STRING)
   previousTypeId?: string;
 
-  @BelongsTo(() => TicketType, 'previousTypeId')
+  @BelongsTo(() => TicketType)
   previousType?: TicketType;
 
   @ForeignKey(() => TicketType)
   @Column(DataType.STRING)
   newTypeId?: string;
 
-  @BelongsTo(() => TicketType, 'newTypeId')
+  @BelongsTo(() => TicketType)
   newType?: TicketType;
 
-  @ForeignKey(() => TicketTag)
+  @ForeignKey(() => Tag)
   @Column(DataType.STRING)
   tagId?: string;
 
-  @BelongsTo(() => TicketTag, 'newTagId')
-  tag?: TicketTag;
+  @BelongsTo(() => Tag)
+  tag?: Tag;
 }
