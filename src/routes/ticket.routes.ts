@@ -10,6 +10,7 @@ ticketRouter.get(
   '/byissue/:issueNumber',
   ticketController.getTicketByIssueNumber,
 );
+ticketRouter.put('/:ticketId', ticketController.editTicketField);
 ticketRouter.post('/', ticketController.createTicket);
 ticketRouter.post('/:ticketId/comments', ticketController.addTicketComment);
 

@@ -48,8 +48,16 @@ export default class Ticket extends Model {
   @Column(DataType.INTEGER)
   issueNumber?: number;
 
+  @ForeignKey(() => User)
+  @Column(DataType.STRING)
+  authorId?: string;
+
   @BelongsTo(() => User, 'authorId')
   author?: User;
+
+  @ForeignKey(() => User)
+  @Column(DataType.STRING)
+  assigneeId?: string;
 
   @BelongsTo(() => User, 'assigneeId')
   assignee?: User;
@@ -58,7 +66,7 @@ export default class Ticket extends Model {
   @Column(DataType.STRING)
   statusId?: string;
 
-  @BelongsTo(() => TicketStatus)
+  @BelongsTo(() => TicketStatus, 'statusId')
   status?: TicketStatus;
 
   @ForeignKey(() => TeamSprint)
@@ -68,8 +76,12 @@ export default class Ticket extends Model {
   @BelongsTo(() => TeamSprint, 'sprintId')
   sprint?: TeamSprint;
 
+  @ForeignKey(() => TicketType)
+  @Column(DataType.STRING)
+  typeId?: string;
+
   @BelongsTo(() => TicketType, 'typeId')
-  ticketType?: TicketType;
+  type?: TicketType;
 
   @BelongsToMany(() => Tag, () => TicketTag)
   tags?: Tag[];

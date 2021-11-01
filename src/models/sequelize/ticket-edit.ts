@@ -14,6 +14,18 @@ import TicketStatus from './ticket-status';
 import TicketType from './ticket-type';
 import User from './user';
 
+export type TicketEditPrevNextField =
+  | 'TITLE'
+  | 'DESCRIPTION'
+  | 'ASSIGNEE'
+  | 'SPRINT'
+  | 'STATUS'
+  | 'TYPE';
+
+export type TicketEditTagField = 'ADD_TAG' | 'REMOVE_TAG';
+
+export type TicketEditField = TicketEditPrevNextField | TicketEditTagField;
+
 @Table({
   timestamps: false,
   underscored: true,
@@ -42,15 +54,7 @@ export default class TicketEdit extends Model {
   ticket?: Ticket;
 
   @Column(DataType.STRING)
-  field?:
-    | 'TITLE'
-    | 'DESCRIPTION'
-    | 'ASSIGNEE'
-    | 'SPRINT'
-    | 'STATUS'
-    | 'ADD_TAG'
-    | 'REMOVE_TAG'
-    | 'TYPE';
+  field?: TicketEditField;
 
   @Column(DataType.STRING)
   previousValue?: string;
