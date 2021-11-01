@@ -43,14 +43,14 @@ export default class TicketEdit extends Model {
   @Column(DataType.STRING)
   editorId?: string;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, 'editorId')
   editor?: User;
 
   @ForeignKey(() => Ticket)
   @Column(DataType.STRING)
   ticketId?: string;
 
-  @BelongsTo(() => Ticket)
+  @BelongsTo(() => Ticket, 'ticketId')
   ticket?: Ticket;
 
   @Column(DataType.STRING)
@@ -66,62 +66,62 @@ export default class TicketEdit extends Model {
   @Column(DataType.STRING)
   previousAssigneeId?: string;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, 'previousAssigneeId')
   previousAssignee?: User;
 
   @ForeignKey(() => User)
   @Column(DataType.STRING)
   newAssigneeId?: string;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, 'newAssigneeId')
   newAssignee?: User;
 
   @ForeignKey(() => TeamSprint)
   @Column(DataType.STRING)
   previousSprintId?: string;
 
-  @BelongsTo(() => TeamSprint)
+  @BelongsTo(() => TeamSprint, 'previousSprintId')
   previousSprint?: TeamSprint;
 
   @ForeignKey(() => TeamSprint)
   @Column(DataType.STRING)
   newSprintId?: string;
 
-  @BelongsTo(() => TeamSprint)
+  @BelongsTo(() => TeamSprint, 'newSprintId')
   newSprint?: TeamSprint;
 
   @ForeignKey(() => TicketStatus)
   @Column(DataType.STRING)
   previousStatusId?: string;
 
-  @BelongsTo(() => TicketStatus)
+  @BelongsTo(() => TicketStatus, 'previousStatusId')
   previousStatus?: TicketStatus;
 
   @ForeignKey(() => TicketStatus)
   @Column(DataType.STRING)
   newStatusId?: string;
 
-  @BelongsTo(() => TicketStatus)
+  @BelongsTo(() => TicketStatus, 'newStatusId')
   newStatus?: TicketStatus;
 
   @ForeignKey(() => TicketType)
   @Column(DataType.STRING)
   previousTypeId?: string;
 
-  @BelongsTo(() => TicketType)
+  @BelongsTo(() => TicketType, 'previousTypeId')
   previousType?: TicketType;
 
   @ForeignKey(() => TicketType)
   @Column(DataType.STRING)
   newTypeId?: string;
 
-  @BelongsTo(() => TicketType)
+  @BelongsTo(() => TicketType, 'newTypeId')
   newType?: TicketType;
 
   @ForeignKey(() => Tag)
   @Column(DataType.STRING)
   tagId?: string;
 
-  @BelongsTo(() => Tag)
+  @BelongsTo(() => Tag, 'tagId')
   tag?: Tag;
 }

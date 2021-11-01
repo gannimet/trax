@@ -1,3 +1,4 @@
+import { FindOptions } from 'sequelize';
 import { HttpErrorString } from '../constants/http-error-string';
 import { HttpErrorMessage } from '../controllers/models/http-error-message';
 import Tag from '../models/sequelize/tag';
@@ -17,6 +18,110 @@ import {
   userExcludedAttributes,
 } from './utils/query-utils';
 
+const ticketOptions: FindOptions = {
+  include: [
+    {
+      model: User,
+      as: 'author',
+      foreignKey: 'authorId',
+      attributes: { exclude: userExcludedAttributes },
+    },
+    {
+      model: User,
+      as: 'assignee',
+      foreignKey: 'assigneeId',
+      attributes: { exclude: userExcludedAttributes },
+    },
+    {
+      model: TicketStatus,
+      foreignKey: 'statusId',
+    },
+    {
+      model: TicketType,
+      foreignKey: 'typeId',
+    },
+    {
+      model: TicketComment,
+      include: [
+        {
+          model: User,
+          as: 'author',
+          attributes: { exclude: userExcludedAttributes },
+        },
+      ],
+    },
+    Tag,
+    {
+      model: TicketEdit,
+      include: [
+        {
+          model: User,
+          as: 'editor',
+          foreignKey: 'editorId',
+          attributes: { exclude: userExcludedAttributes },
+        },
+        {
+          model: User,
+          as: 'previousAssignee',
+          foreignKey: 'previousAssigneeId',
+          attributes: { exclude: userExcludedAttributes },
+        },
+        {
+          model: User,
+          as: 'newAssignee',
+          foreignKey: 'newAssigneeId',
+          attributes: { exclude: userExcludedAttributes },
+        },
+        {
+          model: TeamSprint,
+          as: 'previousSprint',
+          foreignKey: 'previousSprintId',
+          attributes: { exclude: userExcludedAttributes },
+        },
+        {
+          model: TeamSprint,
+          as: 'newSprint',
+          foreignKey: 'newSprintId',
+          attributes: { exclude: userExcludedAttributes },
+        },
+        {
+          model: TicketStatus,
+          as: 'previousStatus',
+          foreignKey: 'previousStatusId',
+          attributes: { exclude: userExcludedAttributes },
+        },
+        {
+          model: TicketStatus,
+          as: 'newStatus',
+          foreignKey: 'newStatusId',
+          attributes: { exclude: userExcludedAttributes },
+        },
+        {
+          model: TicketType,
+          as: 'previousType',
+          foreignKey: 'previousTypeId',
+          attributes: { exclude: userExcludedAttributes },
+        },
+        {
+          model: TicketType,
+          as: 'newType',
+          foreignKey: 'newTypeId',
+          attributes: { exclude: userExcludedAttributes },
+        },
+        {
+          model: Tag,
+          as: 'tag',
+          foreignKey: 'tagId',
+        },
+      ],
+    },
+  ],
+  order: [
+    [{ model: TicketComment, as: 'comments' }, 'createdAt', 'DESC'],
+    [{ model: TicketEdit, as: 'edits' }, 'editedAt', 'DESC'],
+  ],
+};
+
 export default class TicketService {
   getTicketsBySprint(sprintId: string): Promise<Ticket[]> {
     return ensureQueryResult(
@@ -32,46 +137,16 @@ export default class TicketService {
     });
   }
 
+  getTicketById(ticketId: string): Promise<Ticket | null> {
+    return Ticket.findByPk(ticketId, ticketOptions);
+  }
+
   getTicketByIssueNumber(issueNumber: number): Promise<Ticket | null> {
     return Ticket.findOne({
+      ...ticketOptions,
       where: {
         issueNumber,
       },
-      order: [[{ model: TicketComment, as: 'comments' }, 'createdAt', 'DESC']],
-      include: [
-        {
-          model: User,
-          as: 'author',
-          foreignKey: 'authorId',
-          attributes: { exclude: userExcludedAttributes },
-        },
-        {
-          model: User,
-          as: 'assignee',
-          foreignKey: 'assigneeId',
-          attributes: { exclude: userExcludedAttributes },
-        },
-        {
-          model: TicketStatus,
-          foreignKey: 'statusId',
-        },
-        {
-          model: TicketType,
-          foreignKey: 'typeId',
-        },
-        {
-          model: TicketComment,
-          include: [
-            {
-              model: User,
-              as: 'author',
-              attributes: { exclude: userExcludedAttributes },
-            },
-          ],
-        },
-        Tag,
-        TicketEdit,
-      ],
     });
   }
 
@@ -127,13 +202,7 @@ export default class TicketService {
       text,
       createdAt: new Date(),
     }).then(() => {
-      return Ticket.findByPk(ticketId, {
-        include: {
-          all: true,
-          nested: true,
-          attributes: { exclude: userExcludedAttributes },
-        },
-      });
+      return this.getTicketById(ticketId);
     });
   }
 
@@ -206,11 +275,9 @@ export default class TicketService {
         [newColumnName]: newValue,
       });
 
-      return Promise.all([primaryPromise, secondaryPromise]).then(
-        ([primaryResult]) => {
-          return primaryResult;
-        },
-      );
+      return Promise.all([primaryPromise, secondaryPromise]).then(() => {
+        return this.getTicketById(ticketId);
+      });
     });
   }
 }
