@@ -35,6 +35,7 @@ export default class TicketService {
       where: {
         issueNumber,
       },
+      order: [[{ model: TicketComment, as: 'comments' }, 'createdAt', 'DESC']],
       include: [
         {
           model: User,
@@ -66,12 +67,8 @@ export default class TicketService {
             },
           ],
         },
-        {
-          model: Tag,
-        },
-        {
-          model: TicketEdit,
-        },
+        Tag,
+        TicketEdit,
       ],
     });
   }

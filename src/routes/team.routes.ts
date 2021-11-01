@@ -6,8 +6,8 @@ const teamRouter = express.Router();
 const teamController = new TeamController(new TeamService());
 
 // Teams
-teamRouter.get('/', teamController.getAllTeams);
-teamRouter.get('/:teamId', teamController.getTeamById);
+teamRouter.get('/', teamController.getAllTeamsByUser);
+teamRouter.get('/:teamId', teamController.getTeamDetailsForUser);
 teamRouter.post('/', teamController.createTeam);
 
 // Sprints

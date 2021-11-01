@@ -22,20 +22,4 @@ export default class UserController {
       .getUserById(userId)
       .then(sendDataResponseWith404Option(res), sendErrorResponse(res));
   };
-
-  getAllTeamsByUser: RequestHandler = (req, res) => {
-    const { userId } = req.params;
-
-    this.userService
-      .getAllTeamsByUser(userId)
-      .then(sendDataResponse(res), sendErrorResponse(res));
-  };
-
-  getTeamDetailsForUser: RequestHandler = (req, res) => {
-    const { userId, teamId } = req.params;
-
-    this.userService
-      .getTeamDetailsForUser(userId, teamId)
-      .then(sendDataResponseWith404Option(res), sendErrorResponse(res));
-  };
 }

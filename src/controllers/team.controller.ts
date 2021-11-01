@@ -10,17 +10,20 @@ import {
 export default class TeamController {
   constructor(private teamService: TeamService) {}
 
-  getAllTeams: RequestHandler = (req, res) => {
+  getAllTeamsByUser: RequestHandler = (req, res) => {
+    const { authenticatedUser } = res.locals;
+
     this.teamService
-      .getAllTeams()
+      .getAllTeamsByUser(authenticatedUser.id)
       .then(sendDataResponse(res), sendErrorResponse(res));
   };
 
-  getTeamById: RequestHandler = (req, res) => {
+  getTeamDetailsForUser: RequestHandler = (req, res) => {
     const { teamId } = req.params;
+    const { authenticatedUser } = res.locals;
 
     this.teamService
-      .getTeamById(teamId, true)
+      .getTeamDetailsForUser(authenticatedUser.id, teamId)
       .then(sendDataResponseWith404Option(res), sendErrorResponse(res));
   };
 

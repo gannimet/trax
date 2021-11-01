@@ -10,6 +10,7 @@ import {
   createUUID,
   ensureQueryResult,
   ensureUserPermissionByQuery,
+  userExcludedAttributes,
 } from './utils/query-utils';
 
 export type TeamSprintUpdate = Pick<TeamSprint, 'name' | 'description'>;
@@ -58,18 +59,33 @@ const getUserCanEditTeamsPermissionQuery = (userId: string) => {
 };
 
 export default class TeamService {
-  getAllTeams(): Promise<Team[]> {
-    return Team.findAll();
+  getTeamDetailsForUser(
+    userId: string,
+    teamId: string,
+  ): Promise<TeamUser | null> {
+    return TeamUser.findOne({
+      where: {
+        userId,
+        teamId,
+      },
+      include: {
+        all: true,
+        nested: true,
+        attributes: { exclude: userExcludedAttributes },
+      },
+    });
   }
 
-  getTeamById(id: string, includeSprints = false): Promise<Team | null> {
-    const inclusions = [];
-
-    if (includeSprints) {
-      inclusions.push(TeamSprint);
-    }
-
-    return Team.findByPk(id, { include: inclusions });
+  getAllTeamsByUser(userId: string): Promise<TeamUser[]> {
+    return TeamUser.findAll({
+      include: [Team],
+      where: {
+        userId,
+      },
+      attributes: {
+        exclude: ['teamId', 'userId', 'id'],
+      },
+    });
   }
 
   createTeam(

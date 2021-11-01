@@ -1,8 +1,6 @@
 import Team from '../models/sequelize/team';
-import TeamUser from '../models/sequelize/team-user';
 import User from '../models/sequelize/user';
 import UserRole from '../models/sequelize/user-role';
-import { userExcludedAttributes } from './utils/query-utils';
 
 export default class UserService {
   getAllUsers(): Promise<User[]> {
@@ -19,35 +17,6 @@ export default class UserService {
       include: [Team, UserRole],
       attributes: {
         exclude: ['password', 'roleId'],
-      },
-    });
-  }
-
-  getAllTeamsByUser(userId: string): Promise<TeamUser[]> {
-    return TeamUser.findAll({
-      include: [Team],
-      where: {
-        userId,
-      },
-      attributes: {
-        exclude: ['teamId', 'userId', 'id'],
-      },
-    });
-  }
-
-  getTeamDetailsForUser(
-    userId: string,
-    teamId: string,
-  ): Promise<TeamUser | null> {
-    return TeamUser.findOne({
-      where: {
-        userId,
-        teamId,
-      },
-      include: {
-        all: true,
-        nested: true,
-        attributes: { exclude: userExcludedAttributes },
       },
     });
   }
