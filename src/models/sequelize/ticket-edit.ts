@@ -17,6 +17,7 @@ import User from './user';
 export type TicketEditPrevNextField =
   | 'TITLE'
   | 'DESCRIPTION'
+  | 'ESTIMATE'
   | 'ASSIGNEE'
   | 'SPRINT'
   | 'STATUS'
@@ -61,6 +62,12 @@ export default class TicketEdit extends Model {
 
   @Column(DataType.STRING)
   newValue?: string;
+
+  @Column(DataType.FLOAT)
+  previousNumber?: number;
+
+  @Column(DataType.FLOAT)
+  newNumber?: number;
 
   @ForeignKey(() => User)
   @Column(DataType.STRING)

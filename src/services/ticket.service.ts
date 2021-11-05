@@ -210,9 +210,13 @@ export default class TicketService {
     ticketId: string,
     editorId: string,
     field: TicketEditPrevNextField,
-    newValue: string,
+    newValue: string | number | undefined | null,
   ): Promise<Ticket | null> {
     // TODO check user permission to edit tickets
+    if (!this.hasTicketEditFieldValidValue(field, newValue)) {
+      return Promise.reject(HttpErrorString.BAD_REQUEST);
+    }
+
     return Ticket.findByPk(ticketId, {
       include: [{ model: TicketStatus }, { model: TicketType }, { model: Tag }],
     }).then((ticket) => {
@@ -220,7 +224,7 @@ export default class TicketService {
         return null;
       }
 
-      let prevValue: string | undefined;
+      let prevValue: string | number | undefined;
       let prevColumnName: keyof TicketEdit;
       let newColumnName: keyof TicketEdit;
 
@@ -229,37 +233,43 @@ export default class TicketService {
           prevValue = ticket.title;
           prevColumnName = 'previousValue';
           newColumnName = 'newValue';
-          ticket.title = newValue;
+          ticket.title = newValue as string;
           break;
         case 'DESCRIPTION':
           prevValue = ticket.description;
           prevColumnName = 'previousValue';
           newColumnName = 'newValue';
-          ticket.description = newValue;
+          ticket.description = newValue as string;
+          break;
+        case 'ESTIMATE':
+          prevValue = ticket.estimate;
+          prevColumnName = 'previousNumber';
+          newColumnName = 'newNumber';
+          ticket.estimate = newValue as number;
           break;
         case 'ASSIGNEE':
           prevValue = ticket.assigneeId;
           prevColumnName = 'previousAssigneeId';
           newColumnName = 'newAssigneeId';
-          ticket.assigneeId = newValue;
+          ticket.assigneeId = newValue as string;
           break;
         case 'SPRINT':
           prevValue = ticket.sprintId;
           prevColumnName = 'previousSprintId';
           newColumnName = 'newSprintId';
-          ticket.sprintId = newValue;
+          ticket.sprintId = newValue as string;
           break;
         case 'STATUS':
           prevValue = ticket.statusId;
           prevColumnName = 'previousStatusId';
           newColumnName = 'newStatusId';
-          ticket.statusId = newValue;
+          ticket.statusId = newValue as string;
           break;
         case 'TYPE':
           prevValue = ticket.typeId;
           prevColumnName = 'previousTypeId';
           newColumnName = 'newTypeId';
-          ticket.typeId = newValue;
+          ticket.typeId = newValue as string;
           break;
       }
 
@@ -279,5 +289,29 @@ export default class TicketService {
         return this.getTicketById(ticketId);
       });
     });
+  }
+
+  private hasTicketEditFieldValidValue(
+    field: TicketEditPrevNextField,
+    value: string | number | undefined | null,
+  ): boolean {
+    switch (field) {
+      case 'TITLE':
+        return value !== '' && typeof value === 'string';
+      case 'DESCRIPTION':
+        return value === null || typeof value === 'string';
+      case 'ESTIMATE':
+        return value === null || typeof value === 'number';
+      case 'ASSIGNEE':
+        return value === null || typeof value === 'string';
+      case 'SPRINT':
+        return value !== '' || typeof value === 'string';
+      case 'STATUS':
+        return value !== '' || typeof value === 'string';
+      case 'TYPE':
+        return value !== '' || typeof value === 'string';
+      default:
+        return false;
+    }
   }
 }
