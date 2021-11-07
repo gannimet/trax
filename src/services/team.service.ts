@@ -3,14 +3,15 @@ import { HttpErrorString } from '../constants/http-error-string';
 import Team from '../models/sequelize/team';
 import TeamSprint from '../models/sequelize/team-sprint';
 import TeamUser from '../models/sequelize/team-user';
+import Ticket from '../models/sequelize/ticket';
 import TicketStatus from '../models/sequelize/ticket-status';
 import User from '../models/sequelize/user';
 import UserRole from '../models/sequelize/user-role';
+import { ticketIncludeOptions } from './ticket.service';
 import {
   createUUID,
   ensureQueryResult,
   ensureUserPermissionByQuery,
-  userExcludedAttributes,
 } from './utils/query-utils';
 
 export type TeamSprintUpdate = Pick<TeamSprint, 'name' | 'description'>;
@@ -68,11 +69,22 @@ export default class TeamService {
         userId,
         teamId,
       },
-      include: {
-        all: true,
-        nested: true,
-        attributes: { exclude: userExcludedAttributes },
-      },
+      include: [
+        {
+          model: Team,
+          include: [
+            {
+              model: TeamSprint,
+              include: [
+                {
+                  model: Ticket,
+                  ...ticketIncludeOptions,
+                },
+              ],
+            },
+          ],
+        },
+      ],
     });
   }
 

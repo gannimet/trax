@@ -1,4 +1,4 @@
-import { FindOptions } from 'sequelize';
+import { FindOptions, IncludeOptions } from 'sequelize';
 import { HttpErrorString } from '../constants/http-error-string';
 import { HttpErrorMessage } from '../controllers/models/http-error-message';
 import Tag from '../models/sequelize/tag';
@@ -18,7 +18,7 @@ import {
   userExcludedAttributes,
 } from './utils/query-utils';
 
-const ticketOptions: FindOptions = {
+export const ticketIncludeOptions: IncludeOptions = {
   include: [
     {
       model: User,
@@ -116,6 +116,10 @@ const ticketOptions: FindOptions = {
       ],
     },
   ],
+};
+
+export const ticketQueryOptions: FindOptions = {
+  ...ticketIncludeOptions,
   order: [
     [{ model: TicketComment, as: 'comments' }, 'createdAt', 'DESC'],
     [{ model: TicketEdit, as: 'edits' }, 'editedAt', 'DESC'],
@@ -138,12 +142,12 @@ export default class TicketService {
   }
 
   getTicketById(ticketId: string): Promise<Ticket | null> {
-    return Ticket.findByPk(ticketId, ticketOptions);
+    return Ticket.findByPk(ticketId, ticketQueryOptions);
   }
 
   getTicketByIssueNumber(issueNumber: number): Promise<Ticket | null> {
     return Ticket.findOne({
-      ...ticketOptions,
+      ...ticketQueryOptions,
       where: {
         issueNumber,
       },
