@@ -7,7 +7,7 @@ import Ticket from '../models/sequelize/ticket';
 import TicketStatus from '../models/sequelize/ticket-status';
 import User from '../models/sequelize/user';
 import UserRole from '../models/sequelize/user-role';
-import { ticketIncludeOptions } from './ticket.service';
+import { getTicketIncludeOptions } from './utils/query-options';
 import {
   createUUID,
   ensureQueryResult,
@@ -78,9 +78,12 @@ export default class TeamService {
               include: [
                 {
                   model: Ticket,
-                  ...ticketIncludeOptions,
+                  ...getTicketIncludeOptions(),
                 },
               ],
+            },
+            {
+              model: User,
             },
           ],
         },

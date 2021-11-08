@@ -33,8 +33,8 @@ export default class User extends Model {
   @Column(DataType.BOOLEAN)
   emailVerified?: boolean;
 
-  @Column(DataType.BLOB)
-  avatar?: Buffer;
+  @Column(DataType.STRING)
+  avatar?: string;
 
   @Column(DataType.STRING)
   password?: string;

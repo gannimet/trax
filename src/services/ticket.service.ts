@@ -1,4 +1,3 @@
-import { FindOptions, IncludeOptions } from 'sequelize';
 import { HttpErrorString } from '../constants/http-error-string';
 import { HttpErrorMessage } from '../controllers/models/http-error-message';
 import Tag from '../models/sequelize/tag';
@@ -13,118 +12,14 @@ import TicketStatus from '../models/sequelize/ticket-status';
 import TicketType from '../models/sequelize/ticket-type';
 import User from '../models/sequelize/user';
 import {
+  getTicketIncludeOptions,
+  ticketOrderOptions,
+} from './utils/query-options';
+import {
   createUUID,
   ensureQueryResult,
   userExcludedAttributes,
 } from './utils/query-utils';
-
-export const ticketIncludeOptions: IncludeOptions = {
-  include: [
-    {
-      model: User,
-      as: 'author',
-      foreignKey: 'authorId',
-      attributes: { exclude: userExcludedAttributes },
-    },
-    {
-      model: User,
-      as: 'assignee',
-      foreignKey: 'assigneeId',
-      attributes: { exclude: userExcludedAttributes },
-    },
-    {
-      model: TicketStatus,
-      foreignKey: 'statusId',
-    },
-    {
-      model: TicketType,
-      foreignKey: 'typeId',
-    },
-    {
-      model: TicketComment,
-      include: [
-        {
-          model: User,
-          as: 'author',
-          attributes: { exclude: userExcludedAttributes },
-        },
-      ],
-    },
-    Tag,
-    {
-      model: TicketEdit,
-      include: [
-        {
-          model: User,
-          as: 'editor',
-          foreignKey: 'editorId',
-          attributes: { exclude: userExcludedAttributes },
-        },
-        {
-          model: User,
-          as: 'previousAssignee',
-          foreignKey: 'previousAssigneeId',
-          attributes: { exclude: userExcludedAttributes },
-        },
-        {
-          model: User,
-          as: 'newAssignee',
-          foreignKey: 'newAssigneeId',
-          attributes: { exclude: userExcludedAttributes },
-        },
-        {
-          model: TeamSprint,
-          as: 'previousSprint',
-          foreignKey: 'previousSprintId',
-          attributes: { exclude: userExcludedAttributes },
-        },
-        {
-          model: TeamSprint,
-          as: 'newSprint',
-          foreignKey: 'newSprintId',
-          attributes: { exclude: userExcludedAttributes },
-        },
-        {
-          model: TicketStatus,
-          as: 'previousStatus',
-          foreignKey: 'previousStatusId',
-          attributes: { exclude: userExcludedAttributes },
-        },
-        {
-          model: TicketStatus,
-          as: 'newStatus',
-          foreignKey: 'newStatusId',
-          attributes: { exclude: userExcludedAttributes },
-        },
-        {
-          model: TicketType,
-          as: 'previousType',
-          foreignKey: 'previousTypeId',
-          attributes: { exclude: userExcludedAttributes },
-        },
-        {
-          model: TicketType,
-          as: 'newType',
-          foreignKey: 'newTypeId',
-          attributes: { exclude: userExcludedAttributes },
-        },
-        {
-          model: Tag,
-          as: 'tag',
-          foreignKey: 'tagId',
-        },
-      ],
-    },
-  ],
-};
-
-export const ticketQueryOptions: FindOptions = {
-  ...ticketIncludeOptions,
-  order: [
-    [{ model: TicketComment, as: 'comments' }, 'createdAt', 'DESC'],
-    [{ model: TicketEdit, as: 'edits' }, 'editedAt', 'DESC'],
-  ],
-};
 
 export default class TicketService {
   getTicketsBySprint(sprintId: string): Promise<Ticket[]> {
@@ -142,12 +37,39 @@ export default class TicketService {
   }
 
   getTicketById(ticketId: string): Promise<Ticket | null> {
-    return Ticket.findByPk(ticketId, ticketQueryOptions);
+    return Ticket.findByPk(ticketId, {
+      ...getTicketIncludeOptions(),
+      order: ticketOrderOptions,
+    });
   }
 
-  getTicketByIssueNumber(issueNumber: number): Promise<Ticket | null> {
+  getTicketByIssueNumber(
+    issueNumber: number,
+    userId: string,
+  ): Promise<Ticket | null> {
     return Ticket.findOne({
-      ...ticketQueryOptions,
+      ...getTicketIncludeOptions([
+        {
+          model: TeamSprint,
+          include: [
+            {
+              model: Team,
+              include: [
+                {
+                  model: User,
+                  where: {
+                    id: userId,
+                  },
+                  attributes: {
+                    exclude: userExcludedAttributes,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ]),
+      order: ticketOrderOptions,
       where: {
         issueNumber,
       },

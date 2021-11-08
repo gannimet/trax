@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express, { json } from 'express';
+import path from 'path';
 import { Sequelize } from 'sequelize-typescript';
 import { Dialect } from 'sequelize/types';
 import * as dbConf from '../db.conf.json';
@@ -27,6 +28,11 @@ sequelize.authenticate().then(
 
 app.use(json());
 app.use(cors());
+
+app.use(
+  '/images/users',
+  express.static(path.join(__dirname, '../uploads/users')),
+);
 
 /* Routes with NO authentication */
 app.use('/auth', authRouter);

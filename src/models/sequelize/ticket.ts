@@ -91,4 +91,12 @@ export default class Ticket extends Model {
 
   @HasMany(() => TicketComment)
   comments?: TicketComment[];
+
+  canDeleteSprints?: boolean;
+
+  canDeleteTickets?: boolean;
+
+  canEditSprints?: boolean;
+
+  canEditTickets?: boolean;
 }

@@ -21,6 +21,7 @@ export default class TicketController {
 
   getTicketByIssueNumber: RequestHandler = (req, res) => {
     const { issueNumber } = req.params;
+    const { authenticatedUser } = res.locals;
     const numericalIssueNumber = parseInt(issueNumber, 10);
 
     if (Number.isNaN(numericalIssueNumber)) {
@@ -31,7 +32,7 @@ export default class TicketController {
     }
 
     this.ticketService
-      .getTicketByIssueNumber(numericalIssueNumber)
+      .getTicketByIssueNumber(numericalIssueNumber, authenticatedUser.id)
       .then(sendDataResponseWith404Option(res), sendErrorResponse(res));
   };
 
