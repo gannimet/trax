@@ -21,6 +21,33 @@ import {
   userExcludedAttributes,
 } from './utils/query-utils';
 
+const getTicketDetailOptions = (userId: string) => {
+  return {
+    ...getTicketIncludeOptions([
+      {
+        model: TeamSprint,
+        include: [
+          {
+            model: Team,
+            include: [
+              {
+                model: User,
+                where: {
+                  id: userId,
+                },
+                attributes: {
+                  exclude: userExcludedAttributes,
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ]),
+    order: ticketOrderOptions,
+  };
+};
+
 export default class TicketService {
   getTicketsBySprint(sprintId: string): Promise<Ticket[]> {
     return ensureQueryResult(
@@ -36,9 +63,9 @@ export default class TicketService {
     });
   }
 
-  getTicketById(ticketId: string): Promise<Ticket | null> {
+  getTicketById(ticketId: string, userId: string): Promise<Ticket | null> {
     return Ticket.findByPk(ticketId, {
-      ...getTicketIncludeOptions(),
+      ...getTicketDetailOptions(userId),
       order: ticketOrderOptions,
     });
   }
@@ -48,28 +75,7 @@ export default class TicketService {
     userId: string,
   ): Promise<Ticket | null> {
     return Ticket.findOne({
-      ...getTicketIncludeOptions([
-        {
-          model: TeamSprint,
-          include: [
-            {
-              model: Team,
-              include: [
-                {
-                  model: User,
-                  where: {
-                    id: userId,
-                  },
-                  attributes: {
-                    exclude: userExcludedAttributes,
-                  },
-                },
-              ],
-            },
-          ],
-        },
-      ]),
-      order: ticketOrderOptions,
+      ...getTicketDetailOptions(userId),
       where: {
         issueNumber,
       },
@@ -128,7 +134,7 @@ export default class TicketService {
       text,
       createdAt: new Date(),
     }).then(() => {
-      return this.getTicketById(ticketId);
+      return this.getTicketById(ticketId, authorId);
     });
   }
 
@@ -212,7 +218,7 @@ export default class TicketService {
       });
 
       return Promise.all([primaryPromise, secondaryPromise]).then(() => {
-        return this.getTicketById(ticketId);
+        return this.getTicketById(ticketId, editorId);
       });
     });
   }
