@@ -5,6 +5,7 @@ import TeamSprint from '../models/sequelize/team-sprint';
 import TeamUser from '../models/sequelize/team-user';
 import Ticket from '../models/sequelize/ticket';
 import TicketStatus from '../models/sequelize/ticket-status';
+import TicketStatusTransition from '../models/sequelize/ticket-status-transition';
 import User from '../models/sequelize/user';
 import UserRole from '../models/sequelize/user-role';
 import { getTicketIncludeOptions } from './utils/query-options';
@@ -204,6 +205,54 @@ export default class TeamService {
           { where: { id: { [Op.not]: sprintId } } },
         );
       });
+    });
+  }
+
+  getStatusTransitionInfo(teamId: string): Promise<TicketStatus[]> {
+    return TicketStatus.findAll({
+      where: {
+        teamId: {
+          [Op.or]: [teamId, null],
+        },
+      },
+      include: [
+        {
+          model: TicketStatusTransition,
+          foreignKey: 'previousStatusId',
+          as: 'transitionsFrom',
+          attributes: { exclude: ['previousStatusId', 'nextStatusId'] },
+          include: [
+            {
+              model: TicketStatus,
+              foreignKey: 'previousStatusId',
+              as: 'previousStatus',
+            },
+            {
+              model: TicketStatus,
+              foreignKey: 'nextStatusId',
+              as: 'nextStatus',
+            },
+          ],
+        },
+        {
+          model: TicketStatusTransition,
+          foreignKey: 'nextStatusId',
+          as: 'transitionsTo',
+          attributes: { exclude: ['previousStatusId', 'nextStatusId'] },
+          include: [
+            {
+              model: TicketStatus,
+              foreignKey: 'previousStatusId',
+              as: 'previousStatus',
+            },
+            {
+              model: TicketStatus,
+              foreignKey: 'nextStatusId',
+              as: 'nextStatus',
+            },
+          ],
+        },
+      ],
     });
   }
 }

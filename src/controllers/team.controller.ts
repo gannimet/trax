@@ -84,4 +84,12 @@ export default class TeamController {
       .activateSprint(teamId, sprintId, authenticatedUser.id)
       .then(() => res.sendStatus(204), sendErrorResponse(res));
   };
+
+  getStatusTransitionInfo: RequestHandler = (req, res) => {
+    const { teamId } = req.params;
+
+    this.teamService
+      .getStatusTransitionInfo(teamId)
+      .then(sendDataResponse(res), sendErrorResponse(res));
+  };
 }

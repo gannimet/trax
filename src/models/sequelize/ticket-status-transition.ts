@@ -23,13 +23,13 @@ export default class TicketStatusTransition extends Model {
   @Column(DataType.STRING)
   previousStatusId?: string;
 
-  @BelongsTo(() => TicketStatus)
+  @BelongsTo(() => TicketStatus, 'previousStatusId')
   previousStatus?: TicketStatus;
 
   @ForeignKey(() => TicketStatus)
   @Column(DataType.STRING)
   nextStatusId?: string;
 
-  @BelongsTo(() => TicketStatus)
+  @BelongsTo(() => TicketStatus, 'nextStatusId')
   nextStatus?: TicketStatus;
 }

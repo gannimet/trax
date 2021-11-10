@@ -9,6 +9,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import Team from './team';
+import TicketStatusTransition from './ticket-status-transition';
 
 @Table({
   timestamps: false,
@@ -30,6 +31,12 @@ export default class TicketStatus extends Model {
   @BelongsTo(() => Team)
   team?: Team;
 
-  @HasMany(() => Team)
+  @HasMany(() => Team, 'initialTicketStatusId')
   initialStatusForTeam?: Team;
+
+  @HasMany(() => TicketStatusTransition, 'previousStatusId')
+  transitionsFrom?: TicketStatusTransition[];
+
+  @HasMany(() => TicketStatusTransition, 'nextStatusId')
+  transitionsTo?: TicketStatusTransition[];
 }

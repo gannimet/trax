@@ -19,4 +19,7 @@ teamRouter.put(
   teamController.activateSprint,
 );
 
+// Misc
+teamRouter.get('/:teamId/statusinfo', teamController.getStatusTransitionInfo);
+
 export default teamRouter;
