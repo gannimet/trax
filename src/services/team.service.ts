@@ -224,11 +224,6 @@ export default class TeamService {
           include: [
             {
               model: TicketStatus,
-              foreignKey: 'previousStatusId',
-              as: 'previousStatus',
-            },
-            {
-              model: TicketStatus,
               foreignKey: 'nextStatusId',
               as: 'nextStatus',
             },
@@ -244,11 +239,6 @@ export default class TeamService {
               model: TicketStatus,
               foreignKey: 'previousStatusId',
               as: 'previousStatus',
-            },
-            {
-              model: TicketStatus,
-              foreignKey: 'nextStatusId',
-              as: 'nextStatus',
             },
           ],
         },
