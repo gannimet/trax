@@ -18,6 +18,15 @@ export default class TeamController {
       .then(sendDataResponse(res), sendErrorResponse(res));
   };
 
+  getAllUsersInTeam: RequestHandler = (req, res) => {
+    const { teamId } = req.params;
+    const { search = '' } = req.query;
+
+    this.teamService
+      .getAllUsersInTeam(teamId, search as string)
+      .then(sendDataResponse(res), sendErrorResponse(res));
+  };
+
   getTeamDetailsForUser: RequestHandler = (req, res) => {
     const { teamId } = req.params;
     const { authenticatedUser } = res.locals;

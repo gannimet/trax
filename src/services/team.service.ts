@@ -13,6 +13,7 @@ import {
   createUUID,
   ensureQueryResult,
   ensureUserPermissionByQuery,
+  userExcludedAttributes,
 } from './utils/query-utils';
 
 export type TeamSprintUpdate = Pick<TeamSprint, 'name' | 'description'>;
@@ -100,6 +101,32 @@ export default class TeamService {
       },
       attributes: {
         exclude: ['teamId', 'userId', 'id'],
+      },
+    });
+  }
+
+  getAllUsersInTeam(teamId: string, searchValue: string): Promise<User[]> {
+    return User.findAll({
+      where: {
+        [Op.or]: {
+          firstName: {
+            [Op.like]: `%${searchValue}%`,
+          },
+          lastName: {
+            [Op.like]: `%${searchValue}%`,
+          },
+        },
+      },
+      include: [
+        {
+          model: Team,
+          where: {
+            id: teamId,
+          },
+        },
+      ],
+      attributes: {
+        exclude: userExcludedAttributes,
       },
     });
   }

@@ -36,13 +36,13 @@ export default class TeamUser extends Model {
   @Column(DataType.STRING)
   teamId?: string;
 
-  @BelongsTo(() => Team)
+  @BelongsTo(() => Team, 'teamId')
   team?: Team;
 
   @ForeignKey(() => User)
   @Column(DataType.STRING)
   userId?: string;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, 'userId')
   user?: User;
 }

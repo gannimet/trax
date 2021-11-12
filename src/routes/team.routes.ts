@@ -10,6 +10,9 @@ teamRouter.get('/', teamController.getAllTeamsByUser);
 teamRouter.get('/:teamId', teamController.getTeamDetailsForUser);
 teamRouter.post('/', teamController.createTeam);
 
+// Users
+teamRouter.get('/:teamId/users', teamController.getAllUsersInTeam);
+
 // Sprints
 teamRouter.post('/:teamId/sprints', teamController.createSprint);
 teamRouter.delete('/:teamId/sprints/:sprintId', teamController.deleteSprint);
