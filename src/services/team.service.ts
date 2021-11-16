@@ -1,4 +1,4 @@
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { HttpErrorString } from '../constants/http-error-string';
 import Team from '../models/sequelize/team';
 import TeamSprint from '../models/sequelize/team-sprint';
@@ -107,16 +107,15 @@ export default class TeamService {
 
   getAllUsersInTeam(teamId: string, searchValue: string): Promise<User[]> {
     return User.findAll({
-      where: {
-        [Op.or]: {
-          firstName: {
-            [Op.like]: `%${searchValue}%`,
-          },
-          lastName: {
-            [Op.like]: `%${searchValue}%`,
-          },
-        },
-      },
+      where: Sequelize.where(
+        Sequelize.fn(
+          'concat',
+          Sequelize.col('first_name'),
+          ' ',
+          Sequelize.col('last_name'),
+        ),
+        { [Op.like]: `%${searchValue}%` },
+      ),
       include: [
         {
           model: Team,
