@@ -3,6 +3,7 @@ import { HttpErrorMessage } from '../controllers/models/http-error-message';
 import Tag from '../models/sequelize/tag';
 import Team from '../models/sequelize/team';
 import TeamSprint from '../models/sequelize/team-sprint';
+import TeamUser from '../models/sequelize/team-user';
 import Ticket from '../models/sequelize/ticket';
 import TicketComment from '../models/sequelize/ticket-comment';
 import TicketEdit, {
@@ -18,6 +19,7 @@ import {
 import {
   createUUID,
   ensureQueryResult,
+  ensureUserPermissionByQuery,
   userExcludedAttributes,
 } from './utils/query-utils';
 
@@ -46,6 +48,38 @@ const getTicketDetailOptions = (userId: string) => {
     ]),
     order: ticketOrderOptions,
   };
+};
+
+const getUserCanEditTicketsPermissionQuery = (
+  userId: string,
+  ticketId: string,
+) => {
+  return TeamUser.findOne({
+    where: {
+      userId,
+      canEditTickets: true,
+    },
+    include: [
+      {
+        model: Team,
+        foreignKey: 'teamId',
+        include: [
+          {
+            model: TeamSprint,
+            include: [
+              {
+                model: Ticket,
+                foreignKey: 'sprintId',
+                where: {
+                  id: ticketId,
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
 };
 
 export default class TicketService {
@@ -144,81 +178,88 @@ export default class TicketService {
     field: TicketEditPrevNextField,
     newValue: string | number | undefined | null,
   ): Promise<Ticket | null> {
-    // TODO check user permission to edit tickets
-    if (!this.hasTicketEditFieldValidValue(field, newValue)) {
-      return Promise.reject(HttpErrorString.BAD_REQUEST);
-    }
-
-    return Ticket.findByPk(ticketId, {
-      include: [{ model: TicketStatus }, { model: TicketType }, { model: Tag }],
-    }).then((ticket) => {
-      if (!ticket) {
-        return null;
+    return ensureUserPermissionByQuery(
+      getUserCanEditTicketsPermissionQuery(editorId, ticketId),
+    ).then(() => {
+      if (!this.hasTicketEditFieldValidValue(field, newValue)) {
+        return Promise.reject(HttpErrorString.BAD_REQUEST);
       }
 
-      let prevValue: string | number | undefined;
-      let prevColumnName: keyof TicketEdit;
-      let newColumnName: keyof TicketEdit;
+      return Ticket.findByPk(ticketId, {
+        include: [
+          { model: TicketStatus },
+          { model: TicketType },
+          { model: Tag },
+        ],
+      }).then((ticket) => {
+        if (!ticket) {
+          return null;
+        }
 
-      switch (field) {
-        case 'TITLE':
-          prevValue = ticket.title;
-          prevColumnName = 'previousValue';
-          newColumnName = 'newValue';
-          ticket.title = newValue as string;
-          break;
-        case 'DESCRIPTION':
-          prevValue = ticket.description;
-          prevColumnName = 'previousValue';
-          newColumnName = 'newValue';
-          ticket.description = newValue as string;
-          break;
-        case 'ESTIMATE':
-          prevValue = ticket.estimate;
-          prevColumnName = 'previousNumber';
-          newColumnName = 'newNumber';
-          ticket.estimate = newValue as number;
-          break;
-        case 'ASSIGNEE':
-          prevValue = ticket.assigneeId;
-          prevColumnName = 'previousAssigneeId';
-          newColumnName = 'newAssigneeId';
-          ticket.assigneeId = newValue as string;
-          break;
-        case 'SPRINT':
-          prevValue = ticket.sprintId;
-          prevColumnName = 'previousSprintId';
-          newColumnName = 'newSprintId';
-          ticket.sprintId = newValue as string;
-          break;
-        case 'STATUS':
-          prevValue = ticket.statusId;
-          prevColumnName = 'previousStatusId';
-          newColumnName = 'newStatusId';
-          ticket.statusId = newValue as string;
-          break;
-        case 'TYPE':
-          prevValue = ticket.typeId;
-          prevColumnName = 'previousTypeId';
-          newColumnName = 'newTypeId';
-          ticket.typeId = newValue as string;
-          break;
-      }
+        let prevValue: string | number | undefined;
+        let prevColumnName: keyof TicketEdit;
+        let newColumnName: keyof TicketEdit;
 
-      const id = createUUID();
-      const primaryPromise = ticket.save();
-      const secondaryPromise = TicketEdit.create({
-        id,
-        ticketId,
-        editorId,
-        field,
-        editedAt: new Date(),
-        [prevColumnName]: prevValue,
-        [newColumnName]: newValue,
-      });
+        switch (field) {
+          case 'TITLE':
+            prevValue = ticket.title;
+            prevColumnName = 'previousValue';
+            newColumnName = 'newValue';
+            ticket.title = newValue as string;
+            break;
+          case 'DESCRIPTION':
+            prevValue = ticket.description;
+            prevColumnName = 'previousValue';
+            newColumnName = 'newValue';
+            ticket.description = newValue as string;
+            break;
+          case 'ESTIMATE':
+            prevValue = ticket.estimate;
+            prevColumnName = 'previousNumber';
+            newColumnName = 'newNumber';
+            ticket.estimate = newValue as number;
+            break;
+          case 'ASSIGNEE':
+            prevValue = ticket.assigneeId;
+            prevColumnName = 'previousAssigneeId';
+            newColumnName = 'newAssigneeId';
+            ticket.assigneeId = newValue as string;
+            break;
+          case 'SPRINT':
+            prevValue = ticket.sprintId;
+            prevColumnName = 'previousSprintId';
+            newColumnName = 'newSprintId';
+            ticket.sprintId = newValue as string;
+            break;
+          case 'STATUS':
+            prevValue = ticket.statusId;
+            prevColumnName = 'previousStatusId';
+            newColumnName = 'newStatusId';
+            ticket.statusId = newValue as string;
+            break;
+          case 'TYPE':
+            prevValue = ticket.typeId;
+            prevColumnName = 'previousTypeId';
+            newColumnName = 'newTypeId';
+            ticket.typeId = newValue as string;
+            break;
+        }
 
-      return Promise.all([primaryPromise, secondaryPromise]).then(() => {
-        return this.getTicketById(ticketId, editorId);
+        const id = createUUID();
+        const primaryPromise = ticket.save();
+        const secondaryPromise = TicketEdit.create({
+          id,
+          ticketId,
+          editorId,
+          field,
+          editedAt: new Date(),
+          [prevColumnName]: prevValue,
+          [newColumnName]: newValue,
+        });
+
+        return Promise.all([primaryPromise, secondaryPromise]).then(() => {
+          return this.getTicketById(ticketId, editorId);
+        });
       });
     });
   }
