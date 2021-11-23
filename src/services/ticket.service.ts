@@ -53,32 +53,43 @@ const getTicketDetailOptions = (userId: string) => {
 const getUserCanEditTicketsPermissionQuery = (
   userId: string,
   ticketId: string,
-) => {
-  return TeamUser.findOne({
-    where: {
-      userId,
-      canEditTickets: true,
-    },
+): Promise<boolean> => {
+  return Ticket.findByPk(ticketId, {
     include: [
       {
-        model: Team,
-        foreignKey: 'teamId',
+        model: TeamSprint,
+        foreignKey: 'sprintId',
         include: [
           {
-            model: TeamSprint,
-            include: [
-              {
-                model: Ticket,
-                foreignKey: 'sprintId',
-                where: {
-                  id: ticketId,
-                },
-              },
-            ],
+            model: Team,
+            foreignKey: 'teamId',
           },
         ],
       },
     ],
+  }).then((ticket) => {
+    if (!ticket) {
+      return false;
+    }
+
+    const teamId = ticket.sprint?.team?.id;
+
+    if (!teamId) {
+      return false;
+    }
+
+    return TeamUser.findOne({
+      where: {
+        userId,
+        teamId,
+      },
+    }).then((teamUser) => {
+      if (!teamUser) {
+        return false;
+      }
+
+      return teamUser.canEditTickets ?? false;
+    });
   });
 };
 
