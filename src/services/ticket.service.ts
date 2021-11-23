@@ -183,6 +183,10 @@ export default class TicketService {
     });
   }
 
+  getAllTicketTypes(): Promise<TicketType[]> {
+    return TicketType.findAll();
+  }
+
   editTicketField(
     ticketId: string,
     editorId: string,

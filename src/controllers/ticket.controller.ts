@@ -61,6 +61,12 @@ export default class TicketController {
       .then(sendDataResponseWith404Option(res), sendErrorResponse(res));
   };
 
+  getAllTicketTypes: RequestHandler = (req, res) => {
+    this.ticketService
+      .getAllTicketTypes()
+      .then(sendDataResponse(res), sendErrorResponse(res));
+  };
+
   editTicketField: RequestHandler = (req, res) => {
     const { ticketId } = req.params;
     const { field, newValue } = req.body;

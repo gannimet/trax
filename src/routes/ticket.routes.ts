@@ -14,4 +14,6 @@ ticketRouter.put('/:ticketId', ticketController.editTicketField);
 ticketRouter.post('/', ticketController.createTicket);
 ticketRouter.post('/:ticketId/comments', ticketController.addTicketComment);
 
+ticketRouter.get('/types', ticketController.getAllTicketTypes);
+
 export default ticketRouter;

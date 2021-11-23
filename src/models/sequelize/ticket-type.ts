@@ -18,4 +18,7 @@ export default class TicketType extends Model {
 
   @Column(DataType.STRING)
   name?: string;
+
+  @Column(DataType.BOOLEAN)
+  convertible?: boolean;
 }
