@@ -106,6 +106,11 @@ export default class TeamService {
   }
 
   getAllUsersInTeam(teamId: string, searchValue: string): Promise<User[]> {
+    if (searchValue === '') {
+      // TODO consider returning recently/most used users
+      return Promise.resolve([]);
+    }
+
     return User.findAll({
       where: Sequelize.where(
         Sequelize.fn(
