@@ -12,4 +12,12 @@ export default class TagController {
       .getFilteredTags(searchValue as string)
       .then(sendDataResponse(res), sendErrorResponse(res));
   };
+
+  createTag: RequestHandler = (req, res) => {
+    const { name } = req.body;
+
+    this.tagService
+      .createTag(name)
+      .then(sendDataResponse(res), sendErrorResponse(res));
+  };
 }
