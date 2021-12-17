@@ -37,7 +37,8 @@ export default class TicketController {
   };
 
   createTicket: RequestHandler = (req, res) => {
-    const { title, description, sprintId, assigneeId } = req.body;
+    const { title, description, sprintId, assigneeId, tagIds, estimate } =
+      req.body;
     const { authenticatedUser } = res.locals;
 
     this.ticketService
@@ -47,6 +48,8 @@ export default class TicketController {
         title,
         description,
         assigneeId,
+        tagIds,
+        estimate,
       )
       .then(sendDataResponse(res, 201), sendErrorResponse(res));
   };

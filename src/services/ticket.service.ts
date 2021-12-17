@@ -10,6 +10,7 @@ import TicketEdit, {
   TicketEditPrevNextField,
 } from '../models/sequelize/ticket-edit';
 import TicketStatus from '../models/sequelize/ticket-status';
+import TicketTag from '../models/sequelize/ticket-tag';
 import TicketType from '../models/sequelize/ticket-type';
 import User from '../models/sequelize/user';
 import {
@@ -133,6 +134,8 @@ export default class TicketService {
     title: string,
     description?: string,
     assigneeId?: string,
+    tagIds?: string[],
+    estimate?: number,
   ): Promise<Ticket> {
     return ensureQueryResult(
       TeamSprint.findOne({
@@ -150,10 +153,10 @@ export default class TicketService {
       }
 
       const { initialTicketStatusId } = sprint.team;
-      const id = createUUID();
+      const ticketId = createUUID();
 
       return Ticket.create({
-        id,
+        id: ticketId,
         title,
         description,
         authorId: userId,
@@ -161,7 +164,29 @@ export default class TicketService {
         createdAt: new Date(),
         statusId: initialTicketStatusId,
         sprintId,
-      });
+        estimate,
+      }).then(
+        (ticket) => {
+          if (tagIds && tagIds.length > 0) {
+            const tagPromises = tagIds.map((tagId) => {
+              return TicketTag.create({
+                tagId,
+                ticketId,
+              });
+            });
+
+            return Promise.all(tagPromises).then(
+              () => {
+                return ticket;
+              },
+              (err) => Promise.reject(err),
+            );
+          }
+
+          return ticket;
+        },
+        (err) => Promise.reject(err),
+      );
     });
   }
 
